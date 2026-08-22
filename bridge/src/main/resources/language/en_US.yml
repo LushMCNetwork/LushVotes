@@ -1,0 +1,17 @@
+reward:
+  online-credited:
+    - ""
+    - "<#00f396>✉ <bold>THANK YOU FOR YOUR VOTE!"
+    - ""
+    - "<white>Your <#ff7200>vote <white>has been counted! Thanks for supporting"
+    - "<#9d73ff>LushMC <white>and helping our <#ff3cfe>community <white>continue to <#00f396>grow<white>!"
+    - ""
+    - "<#fdf700>▶ Your Reward Has Been Granted! ◀"
+    - ""
+
+claim:
+  nothing: "<#ff1155>✘ You have no vote rewards waiting to be claimed."
+  claimed: "<#00f396>✔ You have successfully claimed %count% vote reward(s)!"
+
+reminder:
+  unclaimed: "<#fdf700>⌚ You have unclaimed vote rewards! Run <white>/vote claim <#fdf700>to collect them."

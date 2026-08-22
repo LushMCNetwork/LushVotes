@@ -1,0 +1,44 @@
+title: "<dark_gray>Voting | Menu"
+size: 27
+
+fill:
+  material: WHITE_STAINED_GLASS_PANE
+  display_name: " "
+corner:
+  material: CYAN_STAINED_GLASS_PANE
+  display_name: " "
+accent:
+  material: LIGHT_BLUE_STAINED_GLASS_PANE
+  display_name: " "
+  accent-slots: [1, 9, 17, 25]
+
+items:
+  "vote":
+    slot: 13
+    material: BELL
+    display_name: "<#00f396><bold>VOTE</bold>"
+    lore:
+      - "<gray>Free Rewards"
+      - ""
+      - "<#fdf700>Information"
+      - "<white>Vote for us daily to support"
+      - "<white>the server and earn rewards!"
+      - ""
+      - "<#fdf700>Rewards Per Vote"
+      - "<#ffe25f>✦ <white>2x Vote Spins"
+      - "<#c68642>⛏ <white>1x Raft Scrap"
+      - "<#00f396><bold>$</bold> <white>$200 Added Balance"
+      - ""
+      - "<#00a4fc>⭐ <white>Your Votes: <#00a4fc>%lushvotes_total_formatted%"
+      - "<#fdf700>⌚ <white>Vote Party: <#fdf700>%lushvotes_party_current%/%lushvotes_party_target%"
+      - ""
+      - "<#fdf700>▶ <bold><underlined>CLICK</underlined></bold> to Vote"
+    actions:
+      - "[message] "
+      - "[message] <#00f396>⭐ <bold>VOTE FOR LUSHMC</bold>"
+      - "[message] "
+      - "[message] <#00a4fc>⚑ <white>Site 1: [https://minecraftservers.org/server/692038](<#00a4fc>Click Here)"
+      - "[message] <#00a4fc>⚑ <white>Site 2: [https://minecraftbestservers.com/server-lushmcnetwork.7172](<#00a4fc>Click Here)"
+      - "[message] "
+      - "[message] <#fdf700>Thank you for supporting the LushMC Network!"
+      - "[message] "

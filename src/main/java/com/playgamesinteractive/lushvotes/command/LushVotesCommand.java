@@ -9,10 +9,14 @@ import com.playgamesinteractive.lushvotes.util.ColorText;
 import com.playgamesinteractive.lushvotes.vote.CreditResult;
 import com.playgamesinteractive.lushvotes.vote.VoteService;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +33,11 @@ public final class LushVotesCommand implements SimpleCommand {
     private static final DateTimeFormatter LAST_VOTE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneOffset.UTC);
 
+    private static final List<String> ADMIN_SUBCOMMANDS = List.of("reload", "credit", "testvote", "check", "party");
+    private static final List<String> PARTY_SUBCOMMANDS = List.of("status", "reset", "set");
+    private static final List<String> BOOLEAN_SUGGESTIONS = List.of("true", "false");
+
+    private final ProxyServer server;
     private final ConfigManager configManager;
     private final VotesBridgeListener bridgeListener;
     private final VoteService voteService;
@@ -36,8 +45,10 @@ public final class LushVotesCommand implements SimpleCommand {
     private final VoteRepository voteRepository;
     private final MojangResolver mojangResolver;
 
-    public LushVotesCommand(ConfigManager configManager, VotesBridgeListener bridgeListener, VoteService voteService,
-                             VotePartyRepository votePartyRepository, VoteRepository voteRepository, MojangResolver mojangResolver) {
+    public LushVotesCommand(ProxyServer server, ConfigManager configManager, VotesBridgeListener bridgeListener,
+                             VoteService voteService, VotePartyRepository votePartyRepository,
+                             VoteRepository voteRepository, MojangResolver mojangResolver) {
+        this.server = server;
         this.configManager = configManager;
         this.bridgeListener = bridgeListener;
         this.voteService = voteService;
@@ -58,7 +69,7 @@ public final class LushVotesCommand implements SimpleCommand {
             reply(invocation, "admin.usage");
             return;
         }
-        String[] rest = java.util.Arrays.copyOfRange(args, 1, args.length);
+        String[] rest = Arrays.copyOfRange(args, 1, args.length);
         if (rest.length == 0) {
             reply(invocation, "admin.usage");
             return;
@@ -71,6 +82,46 @@ public final class LushVotesCommand implements SimpleCommand {
             case "party" -> handleParty(invocation, rest);
             default -> reply(invocation, "admin.unknown");
         }
+    }
+
+    @Override
+    public List<String> suggest(Invocation invocation) {
+        String[] args = invocation.arguments();
+        if (args.length <= 1) {
+            return filter(List.of("admin"), args.length == 0 ? "" : args[0]);
+        }
+        String[] rest = Arrays.copyOfRange(args, 1, args.length);
+        if (rest.length == 1) {
+            return filter(ADMIN_SUBCOMMANDS, rest[0]);
+        }
+        return switch (rest[0].toLowerCase(Locale.ROOT)) {
+            case "credit" -> rest.length == 2 ? filter(onlinePlayerNames(), rest[1]) : List.of();
+            case "testvote" -> suggestTestVote(rest);
+            case "check" -> rest.length == 2 ? filter(onlinePlayerNames(), rest[1]) : List.of();
+            case "party" -> rest.length == 2 ? filter(PARTY_SUBCOMMANDS, rest[1]) : List.of();
+            default -> List.of();
+        };
+    }
+
+    private List<String> suggestTestVote(String[] rest) {
+        if (rest.length == 2) {
+            return filter(onlinePlayerNames(), rest[1]);
+        }
+        if (rest.length == 4) {
+            return filter(BOOLEAN_SUGGESTIONS, rest[3]);
+        }
+        return List.of();
+    }
+
+    private List<String> onlinePlayerNames() {
+        return server.getAllPlayers().stream().map(Player::getUsername).toList();
+    }
+
+    /** Package-private (not private) so LushVotesCommandTest can exercise it directly. */
+    static List<String> filter(List<String> options, String prefix) {
+        return options.stream()
+                .filter(option -> option.toLowerCase(Locale.ROOT).startsWith(prefix.toLowerCase(Locale.ROOT)))
+                .toList();
     }
 
     private void handleReload(Invocation invocation) {

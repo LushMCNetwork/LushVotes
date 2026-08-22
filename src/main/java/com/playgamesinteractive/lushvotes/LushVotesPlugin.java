@@ -72,7 +72,7 @@ public final class LushVotesPlugin {
         server.getEventManager().register(this, new VoteListener(voteService, logger));
 
         server.getCommandManager().register("lushvotes",
-                new LushVotesCommand(configManager, bridgeListener, voteService, votePartyRepository, voteRepository, mojangResolver));
+                new LushVotesCommand(server, configManager, bridgeListener, voteService, votePartyRepository, voteRepository, mojangResolver));
 
         logger.info("LushVotes enabled - listening on NuVotifier-Velocity's event bus.");
     }

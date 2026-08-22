@@ -1,0 +1,23 @@
+language: en_US
+enabled: true
+
+dedupe:
+  window-hours: 20
+
+reward:
+  commands:
+    - "crates key give %player% vote 2 -sf"
+    - "raft admin giveitem %player% scrap 1 -s"
+    - "eco give %player% 200"
+
+celebration:
+  effects: [firework, sound]
+  firework:
+    type: BALL_LARGE
+    color: "#00f396"
+  sound: ENTITY_PLAYER_LEVELUP
+
+vote-party:
+  target: 100
+  commands:
+    - "crates key giveall vote 1 -sf"

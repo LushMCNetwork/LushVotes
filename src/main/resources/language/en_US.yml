@@ -1,0 +1,28 @@
+admin:
+  no-permission: "<#ff1155>✘ You do not have permission to use this command."
+  unknown: "<#ff1155>✘ Unknown /lushvotes admin subcommand. See /lushvotes admin for a list."
+  usage: "<#ff1155>✘ Usage: /lushvotes admin <reload|credit|testvote|check|party>"
+
+  reload:
+    success: "<#00f396>✔ Your LushVotes configuration has been reloaded successfully."
+
+  credit:
+    success: "<#00f396>✔ Successfully credited {player} for their vote on {service} (dedupe window bypassed)."
+    player-not-found: "<#ff1155>✘ Could not resolve a UUID for '{player}'. Please check the username and try again."
+    usage: "<#ff1155>✘ Usage: /lushvotes admin credit [player] [service]"
+
+  testvote:
+    success: "<#00f396>✔ Simulated a vote for {player} on {service} (counted toward party: {counted})."
+    player-not-found: "<#ff1155>✘ Could not resolve a UUID for '{player}'. Please check the username and try again."
+    usage: "<#ff1155>✘ Usage: /lushvotes admin testvote [player] [service] [true|false]"
+
+  check:
+    result: "<#fdf700>✔ {player} has voted {total} time(s). Last vote: {last}."
+    player-not-found: "<#ff1155>✘ Could not resolve a UUID for '{player}'. Please check the username and try again."
+    usage: "<#ff1155>✘ Usage: /lushvotes admin check [player]"
+
+  party:
+    status: "<#fdf700>⌚ Vote party progress: {current}/{target} votes."
+    reset: "<#00f396>✔ Vote party progress has been reset to 0."
+    set: "<#00f396>✔ Vote party progress has been set to {value}/{target}."
+    usage: "<#ff1155>✘ Usage: /lushvotes admin party <status|reset|set [value]>"

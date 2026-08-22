@@ -1,0 +1,12 @@
+name: LushVotesBridge
+version: ${project.version}
+main: com.playgamesinteractive.lushvotes.bridge.LushVotesBridgePlugin
+api-version: '1.21'
+folia-supported: true
+authors: [mechobliterate, PlayGamesInteractive]
+description: Backend companion for LushVotes - executes reward commands, celebration effects, and %lushvotes_*% placeholders.
+website: https://playgamesinteractive.com
+softdepend: [PlaceholderAPI]
+commands:
+  vote:
+    description: Open the voting menu.

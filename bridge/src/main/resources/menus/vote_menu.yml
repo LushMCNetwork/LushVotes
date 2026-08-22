@@ -4,19 +4,31 @@ size: 27
 fill:
   material: WHITE_STAINED_GLASS_PANE
   display_name: " "
+  item_flags: []
+  enchantment_glint_override: false
+  hide_tooltip: true
 corner:
   material: CYAN_STAINED_GLASS_PANE
   display_name: " "
+  item_flags: []
+  enchantment_glint_override: false
+  hide_tooltip: true
 accent:
   material: LIGHT_BLUE_STAINED_GLASS_PANE
   display_name: " "
   accent-slots: [1, 9, 17, 25]
+  item_flags: []
+  enchantment_glint_override: false
+  hide_tooltip: true
 
 items:
   "vote":
     slot: 13
     material: BELL
     display_name: "<#00f396><bold>VOTE</bold>"
+    item_flags: []
+    enchantment_glint_override: false
+    hide_tooltip: false
     lore:
       - "<gray>Free Rewards"
       - ""

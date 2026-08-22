@@ -1,7 +1,6 @@
 package com.playgamesinteractive.lushvotes.bridge;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -9,9 +8,12 @@ import java.util.List;
 /**
  * Dispatches already-rendered reward commands (%player% was substituted on
  * the proxy - see RewardCommandRenderer there) as console.
- * Hops onto the target player's own scheduler first: a reward command may
- * touch their inventory or location (e.g. a "give" alongside an "eco
- * give"), so this can't be pure global-scheduler bookkeeping under Folia.
+ * {@code Bukkit.dispatchCommand} for the console sender must run on
+ * Folia's global tick thread specifically - the entity/region scheduler
+ * an earlier version of this class used throws "Dispatching command async"
+ * (CraftServer#dispatchCommand asserts the global thread outright,
+ * regardless of what the command itself goes on to touch). Same convention
+ * as ActionRunner's CONSOLE action.
  */
 final class RewardExecutor {
 
@@ -21,11 +23,11 @@ final class RewardExecutor {
         this.plugin = plugin;
     }
 
-    void execute(Player player, List<String> commands) {
-        player.getScheduler().run(plugin, task -> {
+    void execute(List<String> commands) {
+        Bukkit.getGlobalRegionScheduler().execute(plugin, () -> {
             for (String command : commands) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
-        }, null);
+        });
     }
 }

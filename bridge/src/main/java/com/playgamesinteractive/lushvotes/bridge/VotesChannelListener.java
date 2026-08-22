@@ -85,7 +85,7 @@ final class VotesChannelListener implements PluginMessageListener {
             // their next /vote claim will pick it up instead.
             return;
         }
-        rewardExecutor.execute(player, reward.commands());
+        rewardExecutor.execute(reward.commands());
         celebrationEffects.celebrateOnline(player, configCache.effects(), configCache.fireworkType(), configCache.fireworkColor(), configCache.sound());
         send(player, VotesProtocol.encodeDeliveredAck(reward.pendingRewardId()));
     }
@@ -99,7 +99,7 @@ final class VotesChannelListener implements PluginMessageListener {
             return; // left before the claim response arrived
         }
         for (VotesProtocol.RewardCommands reward : response.rewards()) {
-            rewardExecutor.execute(player, reward.commands());
+            rewardExecutor.execute(reward.commands());
             send(player, VotesProtocol.encodeDeliveredAck(reward.pendingRewardId()));
         }
         celebrationEffects.showClaimResult(player, response.rewards().size());

@@ -1,18 +1,29 @@
+# Vote Menu
+
+
+# Title
 title: "<dark_gray>Voting | Menu"
+
+# Size
 size: 27
 
+# Fill
 fill:
   material: WHITE_STAINED_GLASS_PANE
   display_name: " "
   item_flags: []
   enchantment_glint_override: false
   hide_tooltip: true
+
+# Corner
 corner:
   material: CYAN_STAINED_GLASS_PANE
   display_name: " "
   item_flags: []
   enchantment_glint_override: false
   hide_tooltip: true
+
+# Accent
 accent:
   material: LIGHT_BLUE_STAINED_GLASS_PANE
   display_name: " "
@@ -21,6 +32,7 @@ accent:
   enchantment_glint_override: false
   hide_tooltip: true
 
+# Items
 items:
   "vote":
     slot: 13

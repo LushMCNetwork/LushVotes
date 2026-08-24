@@ -1,15 +1,24 @@
+# LushVotes Configuration
+
+
+# Language
 language: en_US
+
+# Enabled
 enabled: true
 
+# Dedupe
 dedupe:
   window-hours: 20
 
+# Reward
 reward:
   commands:
-    - "crates key give %player% vote 2 -sf"
+    - "crates key give %player% vote 1 -sf"
     - "raft admin giveitem %player% scrap 1 -s"
     - "eco give %player% 200"
 
+# Celebration
 celebration:
   effects: [firework, sound]
   firework:
@@ -17,6 +26,7 @@ celebration:
     color: "#00f396"
   sound: ENTITY_PLAYER_LEVELUP
 
+# Vote Party
 vote-party:
   target: 100
   commands:

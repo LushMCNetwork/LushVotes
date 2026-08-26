@@ -3,6 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.playgamesinteractive</groupId>
+        <artifactId>lushlicense-build-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../.mvn/lushlicense-build-parent/pom.xml</relativePath>
+    </parent>
 
     <groupId>com.playgamesinteractive</groupId>
     <artifactId>LushVotesBridge</artifactId>
@@ -53,6 +59,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.playgamesinteractive</groupId>
+            <artifactId>lushlicense</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -81,6 +92,9 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

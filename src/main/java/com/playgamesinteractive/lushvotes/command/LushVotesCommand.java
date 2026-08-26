@@ -6,6 +6,7 @@ import com.playgamesinteractive.lushvotes.mojang.MojangResolver;
 import com.playgamesinteractive.lushvotes.storage.VotePartyRepository;
 import com.playgamesinteractive.lushvotes.storage.VoteRepository;
 import com.playgamesinteractive.lushvotes.util.ColorText;
+import com.playgamesinteractive.lushvotes.util.VersionInfo;
 import com.playgamesinteractive.lushvotes.vote.CreditResult;
 import com.playgamesinteractive.lushvotes.vote.VoteService;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -33,7 +34,8 @@ public final class LushVotesCommand implements SimpleCommand {
     private static final DateTimeFormatter LAST_VOTE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneOffset.UTC);
 
-    private static final List<String> ADMIN_SUBCOMMANDS = List.of("reload", "credit", "testvote", "check", "party");
+    private static final List<String> ADMIN_SUBCOMMANDS =
+            List.of("reload", "credit", "testvote", "check", "party", "version");
     private static final List<String> PARTY_SUBCOMMANDS = List.of("status", "reset", "set");
     private static final List<String> BOOLEAN_SUGGESTIONS = List.of("true", "false");
 
@@ -80,6 +82,8 @@ public final class LushVotesCommand implements SimpleCommand {
             case "testvote" -> handleTestVote(invocation, rest);
             case "check" -> handleCheck(invocation, rest);
             case "party" -> handleParty(invocation, rest);
+            case "version" -> reply(invocation, "admin.version",
+                    "commit", VersionInfo.commit(), "built", VersionInfo.built());
             default -> reply(invocation, "admin.unknown");
         }
     }

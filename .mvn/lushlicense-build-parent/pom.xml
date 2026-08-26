@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.playgamesinteractive</groupId>
+    <artifactId>lushlicense-build-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>LushMC License Build Parent</name>
+    <description>Uniform shade, obfuscation, and integrity pipeline for protected LushMC plugins.</description>
+
+    <properties>
+        <lushlicense.proguard.config>${project.basedir}/proguard-license.conf</lushlicense.proguard.config>
+        <lushlicense.hardening.skip>false</lushlicense.hardening.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Declared first so child shade executions run before hardening. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.6.0</version>
+                <executions>
+                    <execution>
+                        <id>harden-embedded-license</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${lushlicense.hardening.skip}</skip>
+                    <proguardVersion>7.4.2</proguardVersion>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}.jar</outjar>
+                    <obfuscate>true</obfuscate>
+                    <proguardInclude>${lushlicense.proguard.config}</proguardInclude>
+                    <libs>
+                        <lib>${java.home}/jmods</lib>
+                    </libs>
+                    <options>
+                        <option>-dontoptimize</option>
+                        <option>-dontshrink</option>
+                    </options>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.guardsquare</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>7.4.2</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.guardsquare</groupId>
+                        <artifactId>proguard-core</artifactId>
+                        <version>9.1.1</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <skip>${lushlicense.hardening.skip}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>refresh-final-license-integrity-hash</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete dir="${project.build.directory}/final-license-integrity" quiet="true"/>
+                                <mkdir dir="${project.build.directory}/final-license-integrity"/>
+                                <unzip src="${project.build.directory}/${project.build.finalName}.jar"
+                                       dest="${project.build.directory}/final-license-integrity"/>
+                                <checksum file="${project.build.directory}/final-license-integrity/com/playgamesinteractive/lushlicense/internal/LicenseStateMachine.class"
+                                          algorithm="SHA-256"
+                                          property="final.license.integrity.hash"/>
+                                <echo file="${project.build.directory}/final-license-integrity/license-integrity.properties">licenseStateMachineSha256=${final.license.integrity.hash}</echo>
+                                <zip destfile="${project.build.directory}/${project.build.finalName}-verified.jar"
+                                     basedir="${project.build.directory}/final-license-integrity"/>
+                                <move file="${project.build.directory}/${project.build.finalName}-verified.jar"
+                                      tofile="${project.build.directory}/${project.build.finalName}.jar"
+                                      overwrite="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

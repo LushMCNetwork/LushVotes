@@ -1,5 +1,7 @@
 package com.playgamesinteractive.lushvotes.bridge;
 
+import com.playgamesinteractive.lushlicense.paper.PaperLicenseGate;
+
 import com.playgamesinteractive.lushvotes.bridge.action.ActionRunner;
 import com.playgamesinteractive.lushvotes.bridge.command.VoteCommand;
 import com.playgamesinteractive.lushvotes.bridge.lang.LangManager;
@@ -18,12 +20,16 @@ import org.slf4j.Logger;
  */
 public final class LushVotesBridgePlugin extends JavaPlugin {
 
+    private PaperLicenseGate license;
+
     private final CelebrationConfigCache configCache = new CelebrationConfigCache();
     private final VoteStatsCache statsCache = new VoteStatsCache();
     private final VotePartyCache partyCache = new VotePartyCache();
 
     @Override
     public void onEnable() {
+        license = PaperLicenseGate.start(this, "LushVotesBridge");
+        if (license == null) return;
         Logger logger = getSLF4JLogger();
 
         LangManager lang = new LangManager(this);
@@ -55,5 +61,10 @@ public final class LushVotesBridgePlugin extends JavaPlugin {
         }
 
         logger.info("LushVotesBridge enabled.");
+    }
+
+    @Override
+    public void onDisable() {
+        if (license != null) license.close();
     }
 }

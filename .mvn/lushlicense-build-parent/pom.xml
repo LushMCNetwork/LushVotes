@@ -31,7 +31,7 @@
             <plugin>
                 <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
-                <version>2.6.0</version>
+                <version>2.7.0</version>
                 <executions>
                     <execution>
                         <id>harden-embedded-license</id>
@@ -43,7 +43,7 @@
                 </executions>
                 <configuration>
                     <skip>${lushlicense.hardening.skip}</skip>
-                    <proguardVersion>7.4.2</proguardVersion>
+                    <proguardVersion>7.10.0</proguardVersion>
                     <injar>${project.build.finalName}.jar</injar>
                     <outjar>${project.build.finalName}.jar</outjar>
                     <obfuscate>true</obfuscate>
@@ -57,16 +57,22 @@
                     </options>
                 </configuration>
                 <dependencies>
+                    <!-- 7.4.2/9.1.1 (Guardsquare's ProGuard/proguard-core) can't parse classfiles
+                         from a JDK newer than Java 21 - reading any library jar built by whichever
+                         JDK happens to launch Maven (java.home, not a pinned build JDK) then fails
+                         outright the moment that JDK is newer. 7.10.0/9.4.0 read modern classfiles
+                         fine, which keeps this build JDK-version-agnostic instead of silently
+                         depending on Maven having been launched under exactly JDK 21. -->
                     <dependency>
                         <groupId>com.guardsquare</groupId>
                         <artifactId>proguard-base</artifactId>
-                        <version>7.4.2</version>
+                        <version>7.10.0</version>
                         <scope>runtime</scope>
                     </dependency>
                     <dependency>
                         <groupId>com.guardsquare</groupId>
                         <artifactId>proguard-core</artifactId>
-                        <version>9.1.1</version>
+                        <version>9.4.0</version>
                         <scope>runtime</scope>
                     </dependency>
                 </dependencies>

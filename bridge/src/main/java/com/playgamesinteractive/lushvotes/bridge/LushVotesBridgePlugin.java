@@ -57,7 +57,9 @@ public final class LushVotesBridgePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new MenuListener(new ActionRunner(this)), this);
         var voteCommand = getCommand("vote");
         if (voteCommand != null) {
-            voteCommand.setExecutor(new VoteCommand(menuManager, this));
+            VoteCommand voteCommandExecutor = new VoteCommand(menuManager, this);
+            voteCommand.setExecutor(voteCommandExecutor);
+            voteCommand.setTabCompleter(voteCommandExecutor);
         }
 
         logger.info("LushVotesBridge enabled.");

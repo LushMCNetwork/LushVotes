@@ -28,20 +28,19 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- A real release, not a SNAPSHOT - deliberate: NuVotifier-velocity's own jitpack
-             build fails specifically because it can't resolve a Velocity SNAPSHOT's metadata
-             (see the nuvotifier.version comment below), so this plugin doesn't repeat that. -->
+        <!-- A real release, not a SNAPSHOT - NuVotifier-velocity is no longer a live
+             dependency to stay compatible with (see the nuvotifier-velocity dependency
+             below), but there's no reason for this plugin's own API dependency to be a
+             SNAPSHOT either. -->
         <velocity.version>3.4.0</velocity.version>
-        <!-- NuVotifier isn't on Maven Central; jitpack builds straight off their repo.
-             v2.6.0 is pinned deliberately, not just "current at the time this was written" -
-             every newer tag through v2.7.3 fails to build on jitpack (nuvotifier-velocity's
-             compileJava can't resolve com.velocitypowered:velocity-api:1.1.0-SNAPSHOT's
-             metadata on jitpack's build machine - an upstream jitpack/Velocity-snapshot-repo
-             issue, not anything in this pom). Before bumping this, confirm a newer tag has a
-             real jitpack build first: https://jitpack.io/api/builds/com.github.NuVotifier/NuVotifier/<tag>
-             should report "status": "ok" with "nuvotifier-velocity" in its module list. -->
-        <nuvotifier.version>v2.6.0</nuvotifier.version>
-        <sqlite.version>3.46.1.3</sqlite.version>
+        <!-- NuVotifier isn't on Maven Central, and JitPack can no longer build it at all:
+             its root build.gradle resolves com.jfrog.bintray.gradle:gradle-bintray-plugin
+             from jcenter(), and JCenter/Bintray was permanently shut down in 2021 - every
+             fresh build fails at Gradle configuration time, before any subproject, tag or
+             commit, forever (verified by forcing a non-cached rebuild off the v2.6.0 tag's
+             exact commit). See LushVotes/libs/README.md - this is why nuvotifier-velocity
+             is a vendored stub jar below instead of a versioned dependency. -->
+        <sqlite.version>3.49.1.0</sqlite.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <junit.version>5.10.2</junit.version>
     </properties>
@@ -50,10 +49,6 @@
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -64,11 +59,16 @@
             <version>${velocity.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Vendored compile-only stub, not the real artifact - see libs/README.md.
+             system scope + a real installed NuVotifier-Velocity jar providing this class
+             at runtime is exactly what "provided" scope already implies; nothing here ships
+             in the shaded plugin jar. -->
         <dependency>
-            <groupId>com.github.NuVotifier.NuVotifier</groupId>
+            <groupId>com.vexsoftware</groupId>
             <artifactId>nuvotifier-velocity</artifactId>
-            <version>${nuvotifier.version}</version>
-            <scope>provided</scope>
+            <version>2.6.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/nuvotifier-velocity-stub-2.6.0.jar</systemPath>
         </dependency>
         <dependency>
             <!-- Bundles a native lib (sqlite-jdbc) - do NOT relocate its package in the

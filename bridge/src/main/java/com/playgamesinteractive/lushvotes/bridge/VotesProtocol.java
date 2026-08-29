@@ -32,6 +32,18 @@ public final class VotesProtocol {
     public static final byte OPCODE_PENDING_COUNT_RESPONSE = 7;
     /** proxy -> bridge, broadcast to every connected backend after each credited vote, and on REQUEST_SYNC catch-up. */
     public static final byte OPCODE_PARTY_PROGRESS = 8;
+    /**
+     * bridge -> proxy, sent on join - "what are this player's real vote
+     * totals?". Unlike REQUEST_SYNC (config/party, network-wide) and
+     * REQUEST_PENDING_COUNT (unclaimed-reward count only), nothing else
+     * ever pushes a player's totalVotes/lastVoteAt to a freshly (re)started
+     * bridge - VoteStatsCache was otherwise only ever touched by REWARD_NOW
+     * and PENDING_RESPONSE, both tied to an actual vote/claim happening
+     * *after* the cache came up, so %lushvotes_total% read 0 for anyone who
+     * hadn't voted or /vote claim'd since.
+     */
+    public static final byte OPCODE_REQUEST_STATS = 9;
+    public static final byte OPCODE_STATS_RESPONSE = 10;
 
     private VotesProtocol() {
     }
@@ -63,6 +75,9 @@ public final class VotesProtocol {
     }
 
     public record PartyProgress(int current, int target) {
+    }
+
+    public record StatsResponse(UUID uuid, VoteStats stats) {
     }
 
     public static byte[] encodeConfigSync(ConfigSync config) {
@@ -187,6 +202,31 @@ public final class VotesProtocol {
     public static PartyProgress decodePartyProgress(byte[] data) throws IOException {
         try (DataInputStream in = payload(data)) {
             return new PartyProgress(in.readInt(), in.readInt());
+        }
+    }
+
+    public static byte[] encodeRequestStats(UUID uuid) {
+        return write(OPCODE_REQUEST_STATS, out -> out.writeUTF(uuid.toString()));
+    }
+
+    public static UUID decodeRequestStats(byte[] data) throws IOException {
+        try (DataInputStream in = payload(data)) {
+            return UUID.fromString(in.readUTF());
+        }
+    }
+
+    public static byte[] encodeStatsResponse(StatsResponse response) {
+        return write(OPCODE_STATS_RESPONSE, out -> {
+            out.writeUTF(response.uuid().toString());
+            writeStats(out, response.stats());
+        });
+    }
+
+    public static StatsResponse decodeStatsResponse(byte[] data) throws IOException {
+        try (DataInputStream in = payload(data)) {
+            UUID uuid = UUID.fromString(in.readUTF());
+            VoteStats stats = readStats(in);
+            return new StatsResponse(uuid, stats);
         }
     }
 

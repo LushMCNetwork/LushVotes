@@ -103,4 +103,28 @@ class VotesProtocolTest {
     void opcodeOfEmptyArrayIsNegativeOne() {
         assertEquals(-1, VotesProtocol.opcodeOf(new byte[0]));
     }
+
+    @Test
+    void requestStatsRoundTrips() throws Exception {
+        byte[] encoded = VotesProtocol.encodeRequestStats(STEVE);
+
+        assertEquals(VotesProtocol.OPCODE_REQUEST_STATS, VotesProtocol.opcodeOf(encoded));
+        assertEquals(STEVE, VotesProtocol.decodeRequestStats(encoded));
+    }
+
+    @Test
+    void statsResponseRoundTrips() throws Exception {
+        var original = new VotesProtocol.StatsResponse(STEVE, new VotesProtocol.VoteStats(12, 1_700_000_000_000L));
+        byte[] encoded = VotesProtocol.encodeStatsResponse(original);
+
+        assertEquals(VotesProtocol.OPCODE_STATS_RESPONSE, VotesProtocol.opcodeOf(encoded));
+        assertEquals(original, VotesProtocol.decodeStatsResponse(encoded));
+    }
+
+    @Test
+    void statsResponseRoundTripsForNeverVoted() throws Exception {
+        var original = new VotesProtocol.StatsResponse(STEVE, new VotesProtocol.VoteStats(0, -1L));
+        byte[] encoded = VotesProtocol.encodeStatsResponse(original);
+        assertEquals(original, VotesProtocol.decodeStatsResponse(encoded));
+    }
 }

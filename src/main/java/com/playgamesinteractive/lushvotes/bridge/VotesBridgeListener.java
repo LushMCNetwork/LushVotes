@@ -26,7 +26,7 @@ import java.util.UUID;
 
 /**
  * Proxy side of {@link VotesBridgeChannel}. Pushes celebration/party config
- * to a freshly (re)connected backend, answers a backend's claim/count
+ * to a freshly (re)connected backend, answers a backend's claim/count/stats
  * requests (auth-checked the same way as LushRelay's
  * PunishBridgeRequestListener - the request only makes sense if that UUID
  * is really a player currently connected through the requesting backend),
@@ -93,6 +93,7 @@ public final class VotesBridgeListener implements RewardDispatcher, VotePartyDis
                 }
                 case VotesProtocol.OPCODE_REQUEST_CLAIM -> handleRequestClaim(connection, data);
                 case VotesProtocol.OPCODE_REQUEST_PENDING_COUNT -> handleRequestPendingCount(connection, data);
+                case VotesProtocol.OPCODE_REQUEST_STATS -> handleRequestStats(connection, data);
                 case VotesProtocol.OPCODE_DELIVERED_ACK -> handleDeliveredAck(data);
                 default -> logger.warn("Unknown LushVotes bridge opcode {} from {}",
                         VotesProtocol.opcodeOf(data), connection.getServerInfo().getName());
@@ -163,6 +164,15 @@ public final class VotesBridgeListener implements RewardDispatcher, VotePartyDis
         }
         int count = pendingRewards.undeliveredCount(uuid);
         send(connection, VotesProtocol.encodePendingCountResponse(new VotesProtocol.PendingCount(uuid, count)));
+    }
+
+    private void handleRequestStats(ServerConnection connection, byte[] data) throws IOException {
+        UUID uuid = VotesProtocol.decodeRequestStats(data);
+        if (!authorized(connection, uuid)) {
+            return;
+        }
+        VotesProtocol.VoteStats stats = statsFor(uuid);
+        send(connection, VotesProtocol.encodeStatsResponse(new VotesProtocol.StatsResponse(uuid, stats)));
     }
 
     private boolean authorized(ServerConnection connection, UUID uuid) {

@@ -23,6 +23,9 @@ import java.io.IOException;
  *   <li>{@code PENDING_COUNT_RESPONSE} - answers this backend's own
  *   {@code REQUEST_PENDING_COUNT} (sent on join); purely informational, a
  *   nudge to run /vote claim, nothing is executed here.</li>
+ *   <li>{@code STATS_RESPONSE} - answers this backend's own
+ *   {@code REQUEST_STATS} (sent on join); refreshes VoteStatsCache with the
+ *   player's real totals, purely informational like PENDING_COUNT_RESPONSE.</li>
  * </ul>
  */
 final class VotesChannelListener implements PluginMessageListener {
@@ -59,6 +62,7 @@ final class VotesChannelListener implements PluginMessageListener {
                 case VotesProtocol.OPCODE_REWARD_NOW -> handleRewardNow(message);
                 case VotesProtocol.OPCODE_PENDING_RESPONSE -> handlePendingResponse(message);
                 case VotesProtocol.OPCODE_PENDING_COUNT_RESPONSE -> handlePendingCountResponse(message);
+                case VotesProtocol.OPCODE_STATS_RESPONSE -> handleStatsResponse(message);
                 default -> logger.warn("Unknown LushVotes opcode {} received", VotesProtocol.opcodeOf(message));
             }
         } catch (IOException | IllegalArgumentException e) {
@@ -115,6 +119,12 @@ final class VotesChannelListener implements PluginMessageListener {
         if (player != null) {
             celebrationEffects.showUnclaimedReminder(player);
         }
+    }
+
+    /** Answers the join-time stats request - purely refreshes the cache, nothing is executed. */
+    private void handleStatsResponse(byte[] message) throws IOException {
+        VotesProtocol.StatsResponse response = VotesProtocol.decodeStatsResponse(message);
+        statsCache.update(response.uuid(), response.stats().totalVotes(), response.stats().lastVoteAtEpochMillis());
     }
 
     private void send(Player player, byte[] payload) {

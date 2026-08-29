@@ -42,7 +42,7 @@ public final class LushVotesBridgePlugin extends JavaPlugin {
                 new VotesChannelListener(this, configCache, statsCache, partyCache, rewardExecutor, celebrationEffects, logger));
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, VotesChannel.NAME);
 
-        RewardJoinRequester joinRequester = new RewardJoinRequester(this, configCache, statsCache);
+        RewardJoinRequester joinRequester = new RewardJoinRequester(this, configCache, statsCache, logger);
         Bukkit.getPluginManager().registerEvents(joinRequester, this);
         joinRequester.requestConfigSyncFromAnyOnlinePlayer();
 

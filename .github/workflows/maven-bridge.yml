@@ -42,4 +42,7 @@ jobs:
     - uses: actions/upload-artifact@v7
       with:
         name: "Package (bridge)"
-        path: "bridge/target/LushVotesBridge-*.jar"
+        path: |
+          bridge/target/LushVotesBridge-*.jar
+          !target/*_proguard_base.jar
+          !bridge/target/*_proguard_base.jar

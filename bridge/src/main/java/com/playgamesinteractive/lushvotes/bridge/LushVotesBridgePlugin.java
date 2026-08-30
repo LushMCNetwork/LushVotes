@@ -1,5 +1,6 @@
 package com.playgamesinteractive.lushvotes.bridge;
 
+import com.playgamesinteractive.lushvotes.bridge.util.VersionInfo;
 import com.playgamesinteractive.lushlicense.paper.PaperLicenseGate;
 
 import com.playgamesinteractive.lushvotes.bridge.action.ActionRunner;
@@ -31,6 +32,7 @@ public final class LushVotesBridgePlugin extends JavaPlugin {
         license = PaperLicenseGate.start(this, "LushVotesBridge");
         if (license == null) return;
         Logger logger = getSLF4JLogger();
+        VersionInfo.load(this);
 
         LangManager lang = new LangManager(this);
         lang.load();

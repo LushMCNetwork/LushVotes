@@ -17,15 +17,12 @@ import java.io.IOException;
  *   %lushvotes_party_*%.</li>
  *   <li>{@code REWARD_NOW} - the player is online right now; run the reward
  *   and celebrate immediately.</li>
- *   <li>{@code PENDING_RESPONSE} - answers this backend's own
- *   {@code REQUEST_CLAIM} (sent by {@code /vote claim}); executes every
- *   queued reward and shows the claim result.</li>
- *   <li>{@code PENDING_COUNT_RESPONSE} - answers this backend's own
- *   {@code REQUEST_PENDING_COUNT} (sent on join); purely informational, a
- *   nudge to run /vote claim, nothing is executed here.</li>
- *   <li>{@code STATS_RESPONSE} - answers this backend's own
- *   {@code REQUEST_STATS} (sent on join); refreshes VoteStatsCache with the
- *   player's real totals, purely informational like PENDING_COUNT_RESPONSE.</li>
+ *   <li>{@code PENDING_RESPONSE} - answers REQUEST_CLAIM; executes every queued
+ *   reward and shows the result.</li>
+ *   <li>{@code PENDING_COUNT_RESPONSE} - answers REQUEST_PENDING_COUNT; a nudge to
+ *   run /vote claim, executes nothing.</li>
+ *   <li>{@code STATS_RESPONSE} - answers REQUEST_STATS; refreshes VoteStatsCache,
+ *   informational only.</li>
  * </ul>
  */
 final class VotesChannelListener implements PluginMessageListener {

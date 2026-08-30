@@ -1,9 +1,5 @@
-# Weekly dependency and action updates.
-#
-# Minor and patch bumps arrive grouped as one PR per ecosystem to keep the volume
-# sane across the plugin set. Majors are ignored here on purpose - they are read
-# and taken deliberately. Security updates are still raised regardless of the
-# schedule, for anything not listed under ignore.
+# Minor/patch grouped into one PR per ecosystem; majors ignored on purpose.
+# Security updates are still raised regardless, except for anything under ignore.
 version: 2
 updates:
   - package-ecosystem: maven
@@ -17,25 +13,19 @@ updates:
       maven-minor-and-patch:
         update-types: [minor, patch]
     ignore:
-      # Server-provided APIs. These must match whatever the running proxy/server
-      # actually ships - they are provided scope and never bundled - so moving them
-      # is a coordinated platform decision, not a dependency bump. Dependabot also
-      # misreads the SNAPSHOT lines badly (it proposed folia-api 26.1.2.build.8-stable).
+      # Server-provided/-installed: version must track the running server, not the
+      # newest release. Dependabot also misreads the SNAPSHOT lines.
       - dependency-name: "dev.folia:*"
       - dependency-name: "io.papermc:*"
       - dependency-name: "com.velocitypowered:*"
       - dependency-name: "net.kyori:*"
-      # Server-installed plugins compiled against, same rule: WorldEdit 7.4.5 does
-      # not compile against this toolchain and CI caught it.
       - dependency-name: "com.sk89q.worldedit:*"
       - dependency-name: "com.sk89q.worldguard:*"
       - dependency-name: "me.clip:*"
-      # Sibling plugins and the license client are vendored into libs/ and
-      # published to no registry - see libs/README.md.
+      # Vendored into libs/, published to no registry - see libs/README.md.
       - dependency-name: "com.playgamesinteractive:*"
-      # Compile-only stub jar, deliberately pinned - see libs/README.md.
+      # Compile-only stub, pinned - see libs/README.md.
       - dependency-name: "com.vexsoftware:*"
-      # Majors get read and taken deliberately, not raised automatically.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
@@ -50,25 +40,19 @@ updates:
       maven-minor-and-patch:
         update-types: [minor, patch]
     ignore:
-      # Server-provided APIs. These must match whatever the running proxy/server
-      # actually ships - they are provided scope and never bundled - so moving them
-      # is a coordinated platform decision, not a dependency bump. Dependabot also
-      # misreads the SNAPSHOT lines badly (it proposed folia-api 26.1.2.build.8-stable).
+      # Server-provided/-installed: version must track the running server, not the
+      # newest release. Dependabot also misreads the SNAPSHOT lines.
       - dependency-name: "dev.folia:*"
       - dependency-name: "io.papermc:*"
       - dependency-name: "com.velocitypowered:*"
       - dependency-name: "net.kyori:*"
-      # Server-installed plugins compiled against, same rule: WorldEdit 7.4.5 does
-      # not compile against this toolchain and CI caught it.
       - dependency-name: "com.sk89q.worldedit:*"
       - dependency-name: "com.sk89q.worldguard:*"
       - dependency-name: "me.clip:*"
-      # Sibling plugins and the license client are vendored into libs/ and
-      # published to no registry - see libs/README.md.
+      # Vendored into libs/, published to no registry - see libs/README.md.
       - dependency-name: "com.playgamesinteractive:*"
-      # Compile-only stub jar, deliberately pinned - see libs/README.md.
+      # Compile-only stub, pinned - see libs/README.md.
       - dependency-name: "com.vexsoftware:*"
-      # Majors get read and taken deliberately, not raised automatically.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 

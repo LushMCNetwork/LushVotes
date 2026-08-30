@@ -7,10 +7,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Reads version.properties, generated at build time from the current git commit
- * (see pom.xml's buildnumber-maven-plugin), so a running server can report which
- * commit a jar was built from. Falls back to "unknown" for a dev build run
- * straight from an IDE, which never goes through Maven packaging.
+ * Reads version.properties, written at build time by buildnumber-maven-plugin.
+ * "unknown" for an IDE build, which never goes through Maven packaging.
  */
 public final class VersionInfo {
 

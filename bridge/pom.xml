@@ -20,8 +20,7 @@
         effects, and exposes %lushvotes_*% placeholders, on Folia/Paper. Owns no policy of its
         own; everything is mirrored down from LushVotes over the "lushvotes:sync" channel.</description>
 
-    <!-- Local-only "connection" so buildnumber-maven-plugin can read the current
-         commit via JGit - never pushed to or fetched from. -->
+    <!-- Local-only, so buildnumber can read the commit via JGit. Never pushed to. -->
     <scm>
         <connection>scm:git:file://${project.basedir}/../.git</connection>
         <developerConnection>scm:git:file://${project.basedir}/../.git</developerConnection>
@@ -77,8 +76,7 @@
     <build>
         <finalName>${project.name}-${project.version}</finalName>
         <plugins>
-            <!-- Exposes ${buildNumber} for version.properties, so a running server can
-                 report which commit a jar was built from. -->
+            <!-- Exposes ${buildNumber} for version.properties. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>

@@ -24,7 +24,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <folia.version>1.21.11-R0.1-SNAPSHOT</folia.version>
+        <folia.version>26.1.2.build.8-stable</folia.version>
         <placeholderapi.version>2.12.2</placeholderapi.version>
         <junit.version>5.10.2</junit.version>
     </properties>

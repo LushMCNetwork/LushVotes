@@ -20,6 +20,14 @@
         effects, and exposes %lushvotes_*% placeholders, on Folia/Paper. Owns no policy of its
         own; everything is mirrored down from LushVotes over the "lushvotes:sync" channel.</description>
 
+    <!-- Local-only "connection" so buildnumber-maven-plugin can read the current
+         commit via JGit - never pushed to or fetched from. -->
+    <scm>
+        <connection>scm:git:file://${project.basedir}/../.git</connection>
+        <developerConnection>scm:git:file://${project.basedir}/../.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -69,6 +77,26 @@
     <build>
         <finalName>${project.name}-${project.version}</finalName>
         <plugins>
+            <!-- Exposes ${buildNumber} for version.properties, so a running server can
+                 report which commit a jar was built from. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                    <shortRevisionLength>7</shortRevisionLength>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

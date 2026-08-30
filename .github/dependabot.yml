@@ -1,8 +1,9 @@
 # Weekly dependency and action updates.
 #
-# Minor and patch bumps arrive grouped as one PR per ecosystem to keep the
-# volume sane across the plugin set; majors come through individually because
-# they need reading. Security updates are raised regardless of this schedule.
+# Minor and patch bumps arrive grouped as one PR per ecosystem to keep the volume
+# sane across the plugin set. Majors are ignored here on purpose - they are read
+# and taken deliberately. Security updates are still raised regardless of the
+# schedule, for anything not listed under ignore.
 version: 2
 updates:
   - package-ecosystem: maven
@@ -16,11 +17,22 @@ updates:
       maven-minor-and-patch:
         update-types: [minor, patch]
     ignore:
+      # Server-provided APIs. These must match whatever the running proxy/server
+      # actually ships - they are provided scope and never bundled - so moving them
+      # is a coordinated platform decision, not a dependency bump. Dependabot also
+      # misreads the SNAPSHOT lines badly (it proposed folia-api 26.1.2.build.8-stable).
+      - dependency-name: "dev.folia:*"
+      - dependency-name: "io.papermc:*"
+      - dependency-name: "com.velocitypowered:*"
+      - dependency-name: "net.kyori:*"
       # Sibling plugins and the license client are vendored into libs/ and
       # published to no registry - see libs/README.md.
       - dependency-name: "com.playgamesinteractive:*"
       # Compile-only stub jar, deliberately pinned - see libs/README.md.
       - dependency-name: "com.vexsoftware:*"
+      # Majors get read and taken deliberately, not raised automatically.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: maven
     directory: "/bridge"
@@ -33,11 +45,22 @@ updates:
       maven-minor-and-patch:
         update-types: [minor, patch]
     ignore:
+      # Server-provided APIs. These must match whatever the running proxy/server
+      # actually ships - they are provided scope and never bundled - so moving them
+      # is a coordinated platform decision, not a dependency bump. Dependabot also
+      # misreads the SNAPSHOT lines badly (it proposed folia-api 26.1.2.build.8-stable).
+      - dependency-name: "dev.folia:*"
+      - dependency-name: "io.papermc:*"
+      - dependency-name: "com.velocitypowered:*"
+      - dependency-name: "net.kyori:*"
       # Sibling plugins and the license client are vendored into libs/ and
       # published to no registry - see libs/README.md.
       - dependency-name: "com.playgamesinteractive:*"
       # Compile-only stub jar, deliberately pinned - see libs/README.md.
       - dependency-name: "com.vexsoftware:*"
+      # Majors get read and taken deliberately, not raised automatically.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: "/"

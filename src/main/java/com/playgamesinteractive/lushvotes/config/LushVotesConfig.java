@@ -10,19 +10,13 @@ import java.util.Map;
  * why Velocity plugins parse config by hand instead of Bukkit's
  * {@code ConfigurationSection} (which doesn't exist on this platform).
  * <p>
- * No site list here - {@code /vote} is a LushVotesBridge inventory GUI now
- * (see bridge's {@code menus/vote_menu.yml}), hand-authored per site rather
- * than templated from proxy config, since each site needs its own icon/lore
- * the way any other menu button does. No reward amount either - a reward is
- * whatever literal command an admin writes (currency, crate keys, items),
- * not a number fed through a fixed template.
+ * No site list or reward amount here - {@code /vote} is a bridge-side inventory
+ * GUI hand-authored per site, and a reward is whatever literal command an admin
+ * writes.
  * <p>
- * {@code celebration.firework.type}/{@code .color} and {@code
- * celebration.sound} are carried as plain strings - Velocity has no Bukkit
- * on its classpath, so this side can't validate them against real
- * {@code FireworkEffect.Type}/{@code Color}/{@code Sound} values. LushVotesBridge
- * does that parsing (with a log+fallback for a bad name) since it's the
- * only side that actually has those enums - see its CelebrationEffects.
+ * Firework and sound settings are carried as plain strings: Velocity has no Bukkit
+ * on its classpath, so this side can't validate them against the real enums.
+ * LushVotesBridge parses them, with a log and fallback for a bad name.
  */
 public final class LushVotesConfig {
 

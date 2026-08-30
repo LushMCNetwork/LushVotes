@@ -25,6 +25,11 @@ updates:
       - dependency-name: "io.papermc:*"
       - dependency-name: "com.velocitypowered:*"
       - dependency-name: "net.kyori:*"
+      # Server-installed plugins compiled against, same rule: WorldEdit 7.4.5 does
+      # not compile against this toolchain and CI caught it.
+      - dependency-name: "com.sk89q.worldedit:*"
+      - dependency-name: "com.sk89q.worldguard:*"
+      - dependency-name: "me.clip:*"
       # Sibling plugins and the license client are vendored into libs/ and
       # published to no registry - see libs/README.md.
       - dependency-name: "com.playgamesinteractive:*"
@@ -53,6 +58,11 @@ updates:
       - dependency-name: "io.papermc:*"
       - dependency-name: "com.velocitypowered:*"
       - dependency-name: "net.kyori:*"
+      # Server-installed plugins compiled against, same rule: WorldEdit 7.4.5 does
+      # not compile against this toolchain and CI caught it.
+      - dependency-name: "com.sk89q.worldedit:*"
+      - dependency-name: "com.sk89q.worldguard:*"
+      - dependency-name: "me.clip:*"
       # Sibling plugins and the license client are vendored into libs/ and
       # published to no registry - see libs/README.md.
       - dependency-name: "com.playgamesinteractive:*"

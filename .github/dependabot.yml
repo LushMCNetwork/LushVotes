@@ -1,0 +1,50 @@
+# Weekly dependency and action updates.
+#
+# Minor and patch bumps arrive grouped as one PR per ecosystem to keep the
+# volume sane across the plugin set; majors come through individually because
+# they need reading. Security updates are raised regardless of this schedule.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+    open-pull-requests-limit: 5
+    groups:
+      maven-minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Sibling plugins and the license client are vendored into libs/ and
+      # published to no registry - see libs/README.md.
+      - dependency-name: "com.playgamesinteractive:*"
+      # Compile-only stub jar, deliberately pinned - see libs/README.md.
+      - dependency-name: "com.vexsoftware:*"
+
+  - package-ecosystem: maven
+    directory: "/bridge"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+    open-pull-requests-limit: 5
+    groups:
+      maven-minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Sibling plugins and the license client are vendored into libs/ and
+      # published to no registry - see libs/README.md.
+      - dependency-name: "com.playgamesinteractive:*"
+      # Compile-only stub jar, deliberately pinned - see libs/README.md.
+      - dependency-name: "com.vexsoftware:*"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+    groups:
+      github-actions:
+        patterns: ["*"]

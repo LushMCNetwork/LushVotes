@@ -31,9 +31,16 @@ upstream project's jitpack build is permanently dead.
 mkdir -p /tmp/nuvotifier-stub/src/com/vexsoftware/votifier/model
 mkdir -p /tmp/nuvotifier-stub/src/com/vexsoftware/votifier/velocity/event
 # write Vote.java / VotifierEvent.java (see this repo's git history for the source)
-cd /tmp/nuvotifier-stub && javac -d classes $(find src -name "*.java")
+cd /tmp/nuvotifier-stub && javac --release 21 -d classes $(find src -name "*.java")
 cd classes && jar cf ../nuvotifier-velocity-stub-2.6.0.jar .
 ```
+
+`--release 21` is required, not optional. Without it `javac` emits class files for
+whatever JDK happens to be installed locally; a JDK newer than 21 produces class files
+CI's JDK 21 cannot read at all, failing with `cannot access VotifierEvent` rather than
+anything that points at the real cause. Verify with
+`unzip -p libs/nuvotifier-velocity-stub-2.6.0.jar 'com/vexsoftware/votifier/velocity/event/VotifierEvent.class' | xxd | head -1`
+- bytes 5-8 must read `0000 0041` (65 = Java 21), not higher.
 
 ## The better fix, if available
 

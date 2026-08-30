@@ -50,3 +50,28 @@ the actual NuVotifier-Velocity jar installed on the production proxy is availabl
 `plugins/` directory, a deploy artifact, etc.), that real jar is strictly better to build
 against: drop it in as `libs/nuvotifier-velocity-2.6.0.jar` and repoint the `pom.xml`
 `<systemPath>` at it instead.
+
+---
+
+# lushlicense-1.0.0.jar
+
+Vendored copy of `com.playgamesinteractive:lushlicense:1.0.0`, the shared license and
+heartbeat client this plugin shades in.
+
+LushMCNetwork/LushLicense is a private repository and the artifact is not published to
+any remote Maven repo, so CI cannot resolve it the way a local `mvn install` can. The
+workflow installs this copy into the runner's local repository before building. Local
+builds keep using whatever is already in `~/.m2` and ignore these files entirely.
+
+## Refreshing after a LushLicense change
+
+```
+cd ../LushLicense && mvn install
+cp ~/.m2/repository/com/playgamesinteractive/lushlicense/1.0.0/lushlicense-1.0.0.jar libs/
+cp ~/.m2/repository/com/playgamesinteractive/lushlicense/1.0.0/lushlicense-1.0.0.pom libs/
+```
+
+The jar must be built with Java 21 or lower - CI runs JDK 21 and cannot read class files
+from a newer JDK. Verify with
+`unzip -p libs/lushlicense-1.0.0.jar 'com/playgamesinteractive/lushlicense/LicenseStateListener.class' | xxd | head -1`;
+bytes 5-8 must read `0000 0041` (65 = Java 21) or lower.

@@ -32,7 +32,7 @@
              dependency to stay compatible with (see the nuvotifier-velocity dependency
              below), but there's no reason for this plugin's own API dependency to be a
              SNAPSHOT either. -->
-        <velocity.version>3.4.0</velocity.version>
+        <velocity.version>4.1.1</velocity.version>
         <!-- NuVotifier isn't on Maven Central, and JitPack can no longer build it at all:
              its root build.gradle resolves com.jfrog.bintray.gradle:gradle-bintray-plugin
              from jcenter(), and JCenter/Bintray was permanently shut down in 2021 - every

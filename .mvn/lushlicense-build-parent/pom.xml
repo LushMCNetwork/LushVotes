@@ -72,7 +72,7 @@
                     <dependency>
                         <groupId>com.guardsquare</groupId>
                         <artifactId>proguard-core</artifactId>
-                        <version>9.4.0</version>
+                        <version>9.4.1</version>
                         <scope>runtime</scope>
                     </dependency>
                 </dependencies>

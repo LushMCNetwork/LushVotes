@@ -1,16 +1,12 @@
-# LushVotes Language Strings (en_US)
-
-
-# Admin
 admin:
   no-permission: "<#ff1155>✘ You do not have permission to use this command."
   unknown: "<#ff1155>✘ Unknown /lushvotes admin subcommand. See /lushvotes admin for a list."
-  usage: "<#ff1155>✘ Usage: /lushvotes admin <reload|credit|testvote|check|party|version>"
+  usage: "<#ff1155>✘ Usage: /lushvotes admin <reload|credit|testvote|check|party|version> [args]"
   version: "<#fdf700>⌚ LushVotes is running commit {commit}, built {built}."
   reload:
     success: "<#00f396>✔ Your LushVotes configuration has been reloaded successfully."
   credit:
-    success: "<#00f396>✔ Successfully credited {player} for their vote on {service} (dedupe window bypassed)."
+    success: "<#00f396>✔ Successfully credited {player} for their vote on {service}."
     player-not-found: "<#ff1155>✘ Could not resolve a UUID for '{player}'. Please check the username and try again."
     usage: "<#ff1155>✘ Usage: /lushvotes admin credit [player] [service]"
   testvote:
@@ -25,4 +21,4 @@ admin:
     status: "<#fdf700>⌚ Vote party progress: {current}/{target} votes."
     reset: "<#00f396>✔ Vote party progress has been reset to 0."
     set: "<#00f396>✔ Vote party progress has been set to {value}/{target}."
-    usage: "<#ff1155>✘ Usage: /lushvotes admin party <status|reset|set [value]>"
+    usage: "<#ff1155>✘ Usage: /lushvotes admin party <status|reset|set> [args]"

@@ -15,14 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Player-visible reaction to a reward. Only ever called for the
- * already-online path (see VotesChannelListener's REWARD_NOW handling) -
- * the offline/claimed path (see /vote claim) shows its own message instead,
- * no effects, since the vote being claimed may be arbitrarily old by then.
- * No network-wide broadcast on a personal vote credit - removed on purpose,
- * it got old fast; the vote party is the community-facing incentive now.
- */
 final class CelebrationEffects {
 
     private static final FireworkEffect.Type DEFAULT_FIREWORK_TYPE = FireworkEffect.Type.BALL_LARGE;
@@ -51,7 +43,6 @@ final class CelebrationEffects {
         }, null);
     }
 
-    /** Result of running /vote claim - either "nothing to claim" or the multi-line "here's what you got" block. */
     void showClaimResult(Player player, int claimedCount) {
         player.getScheduler().run(plugin, task -> {
             if (claimedCount == 0) {
@@ -64,7 +55,6 @@ final class CelebrationEffects {
         }, null);
     }
 
-    /** A one-line nudge on join when the player has rewards waiting - see RewardJoinRequester. */
     void showUnclaimedReminder(Player player) {
         player.getScheduler().run(plugin, task -> player.sendMessage(lang.get("reminder.unclaimed")), null);
     }

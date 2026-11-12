@@ -1,5 +1,7 @@
 package com.playgamesinteractive.lushvotes.bridge.lang;
 
+import com.playgamesinteractive.lushvotes.bridge.util.BundledFiles;
+
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,13 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Loads {@code language/en_US.yml} - copies the jar-bundled default to the
- * plugin data folder on first run, falls back to bundled defaults for any
- * key missing on disk. Same pattern as LushShop/LushAuctions' LangManager;
- * this is a separate copy from LushVotes' own (proxy-side) language file -
- * see that file's header comment for why.
- */
 public class LangManager {
 
     private final JavaPlugin plugin;
@@ -31,10 +26,7 @@ public class LangManager {
     public void load() {
         String resourcePath = "language/en_US.yml";
         File file = new File(plugin.getDataFolder(), resourcePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            plugin.saveResource(resourcePath, false);
-        }
+        BundledFiles.installOnce(plugin, resourcePath); // install-once; missing keys read the bundled copy below
         messages = YamlConfiguration.loadConfiguration(file);
         try (InputStream in = plugin.getResource(resourcePath)) {
             if (in != null) {
@@ -59,14 +51,6 @@ public class LangManager {
         return ColorText.ofWithLinks(raw(key, placeholders));
     }
 
-    /**
-     * A message key that may be authored as either a single string or a
-     * YAML list - reward/offline/claim messages need room for a multi-line
-     * "here's everything you got" block, but a key with only one line
-     * shouldn't be forced into list syntax. Falls back to the key itself
-     * (as a single line) if nothing is configured. Each line supports
-     * {@code [url](text)} masked links, same as MESSAGE actions.
-     */
     public List<Component> lines(String key, Object... placeholders) {
         if (messages.isList(key)) {
             List<Component> result = new ArrayList<>();

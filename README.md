@@ -36,6 +36,21 @@ running `/vote claim`, which pulls everything queued and runs it in one go.
 A vote credited while already online still delivers (and celebrates)
 immediately - only the offline case goes through `/vote claim`.
 
+## Website copy and Bedrock voters
+
+Set `network-database` in `config.yml` to the `s2_network` credentials and every vote is also
+copied to `lush_votes` there, which the website's vote leaderboard reads. `lushvotes.db` stays the
+source of truth: votes are copied by id, so anything missed while MySQL was unreachable is copied
+on the next vote or within five minutes. The first start copies the whole history. Leave the
+password blank to turn the copy off.
+
+A voted name is resolved in this order: a player online on the proxy, then a player LushStats has
+seen (`lush_players`), then Mojang, or for names starting with `bedrock-prefix` (Floodgate's
+`username-prefix`, `_`) the GeyserMC Xbox lookup, which gives the player's Floodgate UUID. A
+prefixed name never goes to Mojang, since a Java account can own the same spelling and would
+receive the reward. Cached answers for prefixed names from older versions are dropped once on
+upgrade.
+
 ## Building
 
 ```bash

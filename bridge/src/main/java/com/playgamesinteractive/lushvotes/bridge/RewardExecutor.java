@@ -6,14 +6,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.List;
 
 /**
- * Dispatches already-rendered reward commands (%player% was substituted on
- * the proxy - see RewardCommandRenderer there) as console.
- * {@code Bukkit.dispatchCommand} for the console sender must run on
- * Folia's global tick thread specifically - the entity/region scheduler
- * an earlier version of this class used throws "Dispatching command async"
- * (CraftServer#dispatchCommand asserts the global thread outright,
- * regardless of what the command itself goes on to touch). Same convention
- * as ActionRunner's CONSOLE action.
+ * Runs vote reward commands as console. The proxy sends the same reward list to every server, so a
+ * command this server doesn't have (such as Raft's {@code raft admin give ...} on Earth
+ * Frontier) is skipped instead of failing.
  */
 final class RewardExecutor {
 
@@ -26,6 +21,11 @@ final class RewardExecutor {
     void execute(List<String> commands) {
         Bukkit.getGlobalRegionScheduler().execute(plugin, () -> {
             for (String command : commands) {
+                String root = command.strip().split("\\s+", 2)[0];
+                if (Bukkit.getCommandMap().getCommand(root) == null) {
+                    plugin.getLogger().fine("Skipping vote reward command not available here: " + root);
+                    continue;
+                }
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
         });

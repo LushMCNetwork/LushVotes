@@ -10,58 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Byte-level codec for every message that crosses {@link VotesBridgeChannel}.
- * Pure encode/decode, no side effects, so both ends can round-trip test it
- * independently - same opcode-byte-first framing convention as LushRelay's
- * vanish/punish channels (see VanishBridgeListener), hand-duplicated on the
- * bridge module's own copy of this class since there's no shared Maven
- * module between the two artifacts (matching LushRelay's own precedent).
- */
 public final class VotesProtocol {
 
     public static final byte OPCODE_CONFIG_SYNC = 0;
     public static final byte OPCODE_REWARD_NOW = 1;
-    /** bridge -> proxy, sent by /vote claim - "give me everything queued and mark it delivered". */
     public static final byte OPCODE_REQUEST_CLAIM = 2;
     public static final byte OPCODE_PENDING_RESPONSE = 3;
     public static final byte OPCODE_DELIVERED_ACK = 4;
     public static final byte OPCODE_REQUEST_SYNC = 5;
-    /** bridge -> proxy, sent on join - "how many rewards are waiting?", informational only, nothing is executed or acked. */
     public static final byte OPCODE_REQUEST_PENDING_COUNT = 6;
     public static final byte OPCODE_PENDING_COUNT_RESPONSE = 7;
-    /** proxy -> bridge, broadcast to every connected backend after each credited vote, and on REQUEST_SYNC catch-up. */
     public static final byte OPCODE_PARTY_PROGRESS = 8;
-    /**
-     * bridge -> proxy, sent on join - "what are this player's real vote
-     * totals?". Unlike REQUEST_SYNC (config/party, network-wide) and
-     * REQUEST_PENDING_COUNT (unclaimed-reward count only), nothing else
-     * ever pushes a player's totalVotes/lastVoteAt to a freshly (re)started
-     * bridge - VoteStatsCache was otherwise only ever touched by REWARD_NOW
-     * and PENDING_RESPONSE, both tied to an actual vote/claim happening
-     * *after* the cache came up, so %lushvotes_total% read 0 for anyone who
-     * hadn't voted or /vote claim'd since.
-     */
     public static final byte OPCODE_REQUEST_STATS = 9;
     public static final byte OPCODE_STATS_RESPONSE = 10;
 
     private VotesProtocol() {
     }
 
-    /** fireworkType/fireworkColor/sound are enum names, validated on the bridge (only side with Bukkit) - see LushVotesConfig's doc. */
     public record ConfigSync(List<String> effects, String fireworkType, String fireworkColor, String sound) {
     }
 
-    /** {@code lastVoteAtEpochMillis} is -1 for "never voted" - only meaningful once {@code totalVotes > 0}. */
     public record VoteStats(long totalVotes, long lastVoteAtEpochMillis) {
     }
 
-    /**
-     * Stats ride along with both reward-delivery messages (rather than a
-     * dedicated opcode) because those are exactly the moments
-     * %lushvotes_total%/%lushvotes_last% need refreshing - immediately after
-     * a credited vote while online, and on claim. See VotesBridgeListener.
-     */
     public record RewardNow(UUID uuid, long pendingRewardId, List<String> commands, VoteStats stats) {
     }
 
@@ -244,7 +215,7 @@ public final class VotesProtocol {
             out.writeByte(opcode);
             writer.write(out);
         } catch (IOException e) {
-            throw new UncheckedIOException(e); // in-memory stream, never actually throws
+            throw new UncheckedIOException(e);
         }
         return bytes.toByteArray();
     }

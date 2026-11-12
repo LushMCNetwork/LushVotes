@@ -31,7 +31,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VoteServiceTest {
@@ -66,7 +65,6 @@ class VoteServiceTest {
         return serviceFor(dataDirectory, null);
     }
 
-    /** partyTarget null means "use the bundled default (50)". */
     private VoteService serviceFor(Path dataDirectory, Integer partyTarget) {
         if (partyTarget != null) {
             writeConfigWithPartyTarget(dataDirectory, partyTarget);
@@ -117,23 +115,13 @@ class VoteServiceTest {
     }
 
     @Test
-    void secondVoteInsideTheWindowIsRejectedAsDuplicate(@TempDir Path tempDir) throws Exception {
+    void backToBackVotesOnTheSameServiceAreBothCredited(@TempDir Path tempDir) throws Exception {
+        // Dedupe is left to the vote sites themselves (they already enforce their own cooldown) - LushVotes
+        // credits whatever Votifier hands it.
         VoteService service = serviceFor(tempDir);
         await(service.processVote("Steve", "PlanetMinecraft"));
 
-        nowMillis[0] += 1000; // a second later, still well inside the default 20h window
-        CreditResult second = await(serviceFor(tempDir).processVote("Steve", "PlanetMinecraft"));
-
-        assertFalse(second.credited());
-        assertEquals("duplicate", second.reason());
-        assertEquals(1, delivered.size()); // no second delivery attempt
-    }
-
-    @Test
-    void voteAfterTheWindowElapsesIsCreditedAgain(@TempDir Path tempDir) throws Exception {
-        await(serviceFor(tempDir).processVote("Steve", "PlanetMinecraft"));
-
-        nowMillis[0] += 21L * 60 * 60 * 1000; // 21 hours later, past the default 20h window
+        nowMillis[0] += 1000;
         CreditResult second = await(serviceFor(tempDir).processVote("Steve", "PlanetMinecraft"));
 
         assertTrue(second.credited());
@@ -141,7 +129,7 @@ class VoteServiceTest {
     }
 
     @Test
-    void adminCreditBypassesDedupeInsideTheWindow(@TempDir Path tempDir) throws Exception {
+    void adminCreditAlwaysCredits(@TempDir Path tempDir) throws Exception {
         VoteService service = serviceFor(tempDir);
         await(service.processVote("Steve", "PlanetMinecraft"));
 
@@ -201,7 +189,7 @@ class VoteServiceTest {
     }
 
     @Test
-    void testVoteBypassesDedupeRegardlessOfPartyFlag(@TempDir Path tempDir) throws Exception {
+    void testVoteAlwaysCreditsRegardlessOfPartyFlag(@TempDir Path tempDir) throws Exception {
         VoteService service = serviceFor(tempDir);
         await(service.processVote("Steve", "PlanetMinecraft"));
 

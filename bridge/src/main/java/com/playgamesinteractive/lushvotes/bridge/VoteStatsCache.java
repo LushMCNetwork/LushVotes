@@ -4,12 +4,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Per-player vote totals mirrored from the proxy, backing
- * %lushvotes_total%/%lushvotes_last%. Only ever holds entries for players
- * who've been on this backend since it started - cleared on quit so it
- * can't answer stale placeholders for someone who isn't here anymore.
- */
 final class VoteStatsCache {
 
     record Stats(long totalVotes, long lastVoteAtEpochMillis) {
@@ -24,6 +18,11 @@ final class VoteStatsCache {
 
     void clear(UUID uuid) {
         stats.remove(uuid);
+    }
+
+    /** Whether the proxy has sent this player's real stats yet; until then {@link #get} reports zero votes. */
+    boolean loaded(UUID uuid) {
+        return stats.containsKey(uuid);
     }
 
     Stats get(UUID uuid) {

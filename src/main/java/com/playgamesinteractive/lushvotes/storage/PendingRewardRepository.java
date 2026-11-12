@@ -11,18 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Delivery queue for credited votes and vote-party rewards. A VOTE-kind row
- * is created the instant a vote is credited (design step 4) and stays
- * undelivered until claimed via {@code /vote claim} or delivered
- * immediately while online; a PARTY-kind row is created once per online
- * player when the vote party threshold is hit. Delivered status is a
- * separate concern from the 20h dedupe in {@link VoteRepository}: this
- * table is about execution-once, not vote-once.
- */
 public final class PendingRewardRepository {
 
-    /** service value stored for PARTY-kind rows - they don't come from any one site. */
     public static final String PARTY_SERVICE = "VOTE_PARTY";
 
     private final Database database;
@@ -70,7 +60,6 @@ public final class PendingRewardRepository {
         }
     }
 
-    /** How many rows are waiting, without rendering/executing anything - backs the join reminder and %lushvotes%-adjacent checks. */
     public int undeliveredCount(UUID uuid) {
         String sql = "SELECT COUNT(*) AS total FROM pending_rewards WHERE uuid = ? AND delivered_at IS NULL";
         try (PreparedStatement statement = database.connection().prepareStatement(sql)) {

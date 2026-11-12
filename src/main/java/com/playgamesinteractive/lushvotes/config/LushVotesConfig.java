@@ -4,25 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Typed, immutable view of {@code config.yml}. Built by {@link ConfigManager}
- * from a raw SnakeYAML {@code Map<String, Object>} - see its class doc for
- * why Velocity plugins parse config by hand instead of Bukkit's
- * {@code ConfigurationSection} (which doesn't exist on this platform).
- * <p>
- * No site list or reward amount here - {@code /vote} is a bridge-side inventory
- * GUI hand-authored per site, and a reward is whatever literal command an admin
- * writes.
- * <p>
- * Firework and sound settings are carried as plain strings: Velocity has no Bukkit
- * on its classpath, so this side can't validate them against the real enums.
- * LushVotesBridge parses them, with a log and fallback for a bad name.
- */
 public final class LushVotesConfig {
 
     private final boolean enabled;
     private final String language;
-    private final int dedupeWindowHours;
     private final List<String> rewardCommands;
     private final List<String> celebrationEffects;
     private final String fireworkType;
@@ -30,14 +15,23 @@ public final class LushVotesConfig {
     private final String celebrationSound;
     private final int votePartyTarget;
     private final List<String> votePartyCommands;
+    private final String bedrockPrefix;
+    private final NetworkDatabase networkDatabase;
 
-    private LushVotesConfig(boolean enabled, String language, int dedupeWindowHours,
+    /** The shared MySQL database the website reads; off while the password is blank. */
+    public record NetworkDatabase(String host, int port, String name, String user, String password) {
+        public boolean enabled() {
+            return password != null && !password.isBlank();
+        }
+    }
+
+    private LushVotesConfig(boolean enabled, String language,
                              List<String> rewardCommands, List<String> celebrationEffects,
                              String fireworkType, String fireworkColor, String celebrationSound,
-                             int votePartyTarget, List<String> votePartyCommands) {
+                             int votePartyTarget, List<String> votePartyCommands,
+                             String bedrockPrefix, NetworkDatabase networkDatabase) {
         this.enabled = enabled;
         this.language = language;
-        this.dedupeWindowHours = dedupeWindowHours;
         this.rewardCommands = List.copyOf(rewardCommands);
         this.celebrationEffects = List.copyOf(celebrationEffects);
         this.fireworkType = fireworkType;
@@ -45,13 +39,16 @@ public final class LushVotesConfig {
         this.celebrationSound = celebrationSound;
         this.votePartyTarget = votePartyTarget;
         this.votePartyCommands = List.copyOf(votePartyCommands);
+        this.bedrockPrefix = bedrockPrefix;
+        this.networkDatabase = networkDatabase;
     }
 
     public static LushVotesConfig defaults() {
-        return new LushVotesConfig(true, "en_US", 20,
+        return new LushVotesConfig(true, "en_US",
                 List.of("eco give %player% 100"), List.of("firework", "sound"),
                 "BALL_LARGE", "#fdf700", "ENTITY_PLAYER_LEVELUP",
-                50, List.of("eco give %player% 500"));
+                50, List.of("eco give %player% 500"),
+                "_", new NetworkDatabase("127.0.0.1", 3306, "network", "network", ""));
     }
 
     @SuppressWarnings("unchecked")
@@ -63,9 +60,6 @@ public final class LushVotesConfig {
 
         boolean enabled = boolOr(root.get("enabled"), d.enabled);
         String language = stringOr(root.get("language"), d.language);
-
-        Map<String, Object> dedupe = mapOr(root.get("dedupe"));
-        int dedupeWindowHours = intOr(dedupe.get("window-hours"), d.dedupeWindowHours);
 
         Map<String, Object> reward = mapOr(root.get("reward"));
         List<String> rewardCommands = stringListOr(reward.get("commands"), d.rewardCommands);
@@ -81,9 +75,19 @@ public final class LushVotesConfig {
         int votePartyTarget = Math.max(1, intOr(votePartyMap.get("target"), d.votePartyTarget));
         List<String> votePartyCommands = stringListOr(votePartyMap.get("commands"), d.votePartyCommands);
 
-        return new LushVotesConfig(enabled, language, dedupeWindowHours, rewardCommands,
+        String bedrockPrefix = stringOr(root.get("bedrock-prefix"), d.bedrockPrefix);
+
+        Map<String, Object> db = mapOr(root.get("network-database"));
+        NetworkDatabase networkDatabase = new NetworkDatabase(
+                stringOr(db.get("host"), d.networkDatabase.host()),
+                intOr(db.get("port"), d.networkDatabase.port()),
+                stringOr(db.get("name"), d.networkDatabase.name()),
+                stringOr(db.get("user"), d.networkDatabase.user()),
+                stringOr(db.get("password"), d.networkDatabase.password()));
+
+        return new LushVotesConfig(enabled, language, rewardCommands,
                 celebrationEffects, fireworkType, fireworkColor, celebrationSound,
-                votePartyTarget, votePartyCommands);
+                votePartyTarget, votePartyCommands, bedrockPrefix, networkDatabase);
     }
 
     @SuppressWarnings("unchecked")
@@ -122,10 +126,6 @@ public final class LushVotesConfig {
         return language;
     }
 
-    public int dedupeWindowHours() {
-        return dedupeWindowHours;
-    }
-
     public List<String> rewardCommands() {
         return rewardCommands;
     }
@@ -134,27 +134,31 @@ public final class LushVotesConfig {
         return celebrationEffects;
     }
 
-    /** {@code FireworkEffect.Type} name, e.g. "BALL_LARGE" - validated on the bridge, not here. */
     public String fireworkType() {
         return fireworkType;
     }
 
-    /** {@code org.bukkit.Color} field name (e.g. "YELLOW") or a "#rrggbb" hex string - resolved on the bridge, not here. */
     public String fireworkColor() {
         return fireworkColor;
     }
 
-    /** {@code Sound} enum name, e.g. "ENTITY_PLAYER_LEVELUP" - validated on the bridge, not here. */
     public String celebrationSound() {
         return celebrationSound;
     }
 
-    /** Votes needed network-wide to trigger a vote party (rewards every online player). */
     public int votePartyTarget() {
         return votePartyTarget;
     }
 
     public List<String> votePartyCommands() {
         return votePartyCommands;
+    }
+
+    public String bedrockPrefix() {
+        return bedrockPrefix;
+    }
+
+    public NetworkDatabase networkDatabase() {
+        return networkDatabase;
     }
 }

@@ -1,5 +1,7 @@
 package com.playgamesinteractive.lushvotes.bridge.menu;
 
+import com.playgamesinteractive.lushvotes.bridge.util.BundledFiles;
+
 import com.playgamesinteractive.lushvotes.bridge.action.Action;
 import com.playgamesinteractive.lushvotes.bridge.action.ActionParser;
 import com.playgamesinteractive.lushvotes.bridge.lang.ColorText;
@@ -23,16 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-/**
- * Loads menus/*.yml from the plugin data folder and builds Bukkit
- * inventories from them on demand. Menu layout/text/icons are fully
- * config-driven; each item's actions run through the shared ActionRunner.
- * Only bundled default here is {@code vote_menu.yml}. Icons are built fresh
- * on every {@link #open} (not cached at load time) so display name/lore can
- * carry live PlaceholderAPI values (e.g. %lushvotes_total_formatted%) per
- * viewer - decoration layers (fill/corner/accent) are the exception, built
- * once at load time since they never carry placeholders.
- */
 public class MenuManager {
 
     private static final String[] BUNDLED_DEFAULTS = {
@@ -41,8 +33,7 @@ public class MenuManager {
 
     private final Plugin plugin;
     private final File menusDir;
-    // volatile immutable snapshot: reload happens on one region thread while
-    // opens read from many on Folia
+
     private volatile Map<String, Menu> menus = Map.of();
 
     public MenuManager(Plugin plugin) {
@@ -54,7 +45,7 @@ public class MenuManager {
         if (!menusDir.exists()) {
             menusDir.mkdirs();
         }
-        extractBundledDefaultsIfMissing();
+        installBundledMenus();
 
         File[] files = menusDir.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files == null) {
@@ -74,11 +65,9 @@ public class MenuManager {
         plugin.getLogger().info("Loaded " + loaded.size() + " menu(s).");
     }
 
-    private void extractBundledDefaultsIfMissing() {
+    private void installBundledMenus() {
         for (String fileName : BUNDLED_DEFAULTS) {
-            if (!new File(menusDir, fileName).exists() && plugin.getResource("menus/" + fileName) != null) {
-                plugin.saveResource("menus/" + fileName, false);
-            }
+            BundledFiles.installOnce(plugin, "menus/" + fileName); // a deleted menu stays deleted
         }
     }
 
@@ -133,7 +122,6 @@ public class MenuManager {
         return new Menu(id, title, size, fill, corner, accent, accentSlots, items);
     }
 
-    /** {@code fill.material}/{@code corner.material}/{@code accent.material} - absent entirely means "skip this layer". */
     private ItemStack parseDecoration(YamlConfiguration yaml, String path, String fileName) {
         if (!yaml.isSet(path + "material")) {
             return null;
@@ -152,7 +140,6 @@ public class MenuManager {
         return buildIcon(material, displayName, List.of(), itemFlags, glintOverride, hideTooltip);
     }
 
-    /** slot/slots can be given explicitly; otherwise the item's own YAML key is tried as a single numeric slot. */
     private List<Integer> resolveItemSlots(YamlConfiguration yaml, String path, String key) {
         List<?> rawSlots = yaml.getList(path + "slots");
         if (rawSlots != null && !rawSlots.isEmpty()) {
@@ -166,12 +153,6 @@ public class MenuManager {
         return keyAsSlot != null ? List.of(keyAsSlot) : List.of();
     }
 
-    /**
-     * Expands a raw YAML list into concrete slot numbers - a filler like
-     * "slots: [1, 9, 17, 25]" or a range "start-end" (both ends inclusive,
-     * order-independent), mixed freely. Unparseable entries are logged and
-     * skipped rather than failing the whole menu.
-     */
     private List<Integer> parseSlots(List<?> raw) {
         List<Integer> slots = new ArrayList<>();
         for (Object entry : raw) {
@@ -199,7 +180,6 @@ public class MenuManager {
         return slots;
     }
 
-    /** Drops any slot outside [0, size) instead of letting it crash Inventory#setItem later. */
     private List<Integer> inBounds(List<Integer> slots, int size, String context, String fileName) {
         List<Integer> valid = new ArrayList<>();
         for (int slot : slots) {
@@ -245,7 +225,6 @@ public class MenuManager {
         viewer.openInventory(inventory);
     }
 
-    /** fill (every slot) -> corner (0 and size-1) -> accent (accent-slots) - each layer overwrites the previous where they overlap. */
     private void paintDecorations(Inventory inventory, Menu menu) {
         if (menu.fill() != null) {
             for (int slot = 0; slot < menu.size(); slot++) {

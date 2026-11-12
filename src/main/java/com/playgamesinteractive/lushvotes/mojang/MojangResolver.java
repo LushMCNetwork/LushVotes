@@ -11,17 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Username -> UUID resolution used by every credited vote (a name change
- * means the wrong account gets credited if this is skipped). Cache-first;
- * a live Mojang call only happens on a cache miss or an expired entry, and
- * re-resolves every 30 days to tolerate name changes without hammering
- * Mojang for players who vote often.
- * <p>
- * v1 makes exactly one lookup attempt per vote - no persistent retry queue.
- * A Mojang failure logs a warning and the vote is not credited; recovering
- * it is what {@code /lushvotes admin credit} is for.
- */
 public final class MojangResolver {
 
     private static final Duration CACHE_TTL = Duration.ofDays(30);

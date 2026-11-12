@@ -1,5 +1,7 @@
 package com.playgamesinteractive.lushvotes.bridge.lang;
 
+import com.playgamesinteractive.lushvotes.bridge.util.BundledFiles;
+
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,10 +26,7 @@ public class LangManager {
     public void load() {
         String resourcePath = "language/en_US.yml";
         File file = new File(plugin.getDataFolder(), resourcePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            plugin.saveResource(resourcePath, false);
-        }
+        BundledFiles.installOnce(plugin, resourcePath); // install-once; missing keys read the bundled copy below
         messages = YamlConfiguration.loadConfiguration(file);
         try (InputStream in = plugin.getResource(resourcePath)) {
             if (in != null) {

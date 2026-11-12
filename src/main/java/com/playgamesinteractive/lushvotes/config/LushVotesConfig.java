@@ -15,11 +15,21 @@ public final class LushVotesConfig {
     private final String celebrationSound;
     private final int votePartyTarget;
     private final List<String> votePartyCommands;
+    private final String bedrockPrefix;
+    private final NetworkDatabase networkDatabase;
+
+    /** The shared MySQL database the website reads; off while the password is blank. */
+    public record NetworkDatabase(String host, int port, String name, String user, String password) {
+        public boolean enabled() {
+            return password != null && !password.isBlank();
+        }
+    }
 
     private LushVotesConfig(boolean enabled, String language,
                              List<String> rewardCommands, List<String> celebrationEffects,
                              String fireworkType, String fireworkColor, String celebrationSound,
-                             int votePartyTarget, List<String> votePartyCommands) {
+                             int votePartyTarget, List<String> votePartyCommands,
+                             String bedrockPrefix, NetworkDatabase networkDatabase) {
         this.enabled = enabled;
         this.language = language;
         this.rewardCommands = List.copyOf(rewardCommands);
@@ -29,13 +39,16 @@ public final class LushVotesConfig {
         this.celebrationSound = celebrationSound;
         this.votePartyTarget = votePartyTarget;
         this.votePartyCommands = List.copyOf(votePartyCommands);
+        this.bedrockPrefix = bedrockPrefix;
+        this.networkDatabase = networkDatabase;
     }
 
     public static LushVotesConfig defaults() {
         return new LushVotesConfig(true, "en_US",
                 List.of("eco give %player% 100"), List.of("firework", "sound"),
                 "BALL_LARGE", "#fdf700", "ENTITY_PLAYER_LEVELUP",
-                50, List.of("eco give %player% 500"));
+                50, List.of("eco give %player% 500"),
+                "_", new NetworkDatabase("127.0.0.1", 3306, "network", "network", ""));
     }
 
     @SuppressWarnings("unchecked")
@@ -62,9 +75,19 @@ public final class LushVotesConfig {
         int votePartyTarget = Math.max(1, intOr(votePartyMap.get("target"), d.votePartyTarget));
         List<String> votePartyCommands = stringListOr(votePartyMap.get("commands"), d.votePartyCommands);
 
+        String bedrockPrefix = stringOr(root.get("bedrock-prefix"), d.bedrockPrefix);
+
+        Map<String, Object> db = mapOr(root.get("network-database"));
+        NetworkDatabase networkDatabase = new NetworkDatabase(
+                stringOr(db.get("host"), d.networkDatabase.host()),
+                intOr(db.get("port"), d.networkDatabase.port()),
+                stringOr(db.get("name"), d.networkDatabase.name()),
+                stringOr(db.get("user"), d.networkDatabase.user()),
+                stringOr(db.get("password"), d.networkDatabase.password()));
+
         return new LushVotesConfig(enabled, language, rewardCommands,
                 celebrationEffects, fireworkType, fireworkColor, celebrationSound,
-                votePartyTarget, votePartyCommands);
+                votePartyTarget, votePartyCommands, bedrockPrefix, networkDatabase);
     }
 
     @SuppressWarnings("unchecked")
@@ -129,5 +152,13 @@ public final class LushVotesConfig {
 
     public List<String> votePartyCommands() {
         return votePartyCommands;
+    }
+
+    public String bedrockPrefix() {
+        return bedrockPrefix;
+    }
+
+    public NetworkDatabase networkDatabase() {
+        return networkDatabase;
     }
 }

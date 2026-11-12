@@ -1,4 +1,4 @@
-title: "<dark_gray>Voting | Vote Sites"
+title: '<dark_gray>Voting | Vote Sites'
 
 size: 27
 
@@ -17,7 +17,7 @@ corner:
   hide_tooltip: true
 
 accent:
-  material: LIGHT_BLUE_STAINED_GLASS_PANE
+  material: CYAN_STAINED_GLASS_PANE
   display_name: " "
   accent-slots: [1, 9, 17, 25]
   item_flags: []
@@ -41,7 +41,7 @@ items:
       - "<#9d73ff>✈ <white>10 Minutes of Fly Time"
       - "<#00f396><bold>$</bold> <white>$200 Added Balance"
       - ""
-      - "<#00a4fc>⭐ <white>Your Votes: <#00a4fc>%lushvotes_total_formatted%"
+      - "<#00a4fe>⭐ <white>Your Votes: <#00a4fe>%lushvotes_total_formatted%"
       - "<#fdf700>⌚ <white>Vote Party: <#fdf700>%lushvotes_party_current%/%lushvotes_party_target%"
       - ""
       - "<#fdf700>▶ <bold><underlined>CLICK</underlined></bold> to Vote"
@@ -49,8 +49,8 @@ items:
       - "[message] "
       - "[message] <#00f396>⭐ <bold>VOTE FOR LUSHMC</bold>"
       - "[message] "
-      - "[message] <#00a4fc>⚑ <white>Site 1: [https://minecraftservers.org/server/692038](<#00a4fc>Click Here)"
-      - "[message] <#00a4fc>⚑ <white>Site 2: [https://minecraftbestservers.com/server-lushmcnetwork.7172](<#00a4fc>Click Here)"
+      - "[message] <#00a4fe>⚑ <white>Site 1: [https://minecraftservers.org/server/692038](<#00a4fe>Click Here)"
+      - "[message] <#00a4fe>⚑ <white>Site 2: [https://minecraftbestservers.com/server-lushmcnetwork.7172](<#00a4fe>Click Here)"
       - "[message] "
       - "[message] <#fdf700>Thank you for supporting the LushMC Network!"
       - "[message] "

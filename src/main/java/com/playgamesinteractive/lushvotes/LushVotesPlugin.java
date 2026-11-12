@@ -5,9 +5,12 @@ import com.playgamesinteractive.lushvotes.bridge.VotesBridgeChannel;
 import com.playgamesinteractive.lushvotes.bridge.VotesBridgeListener;
 import com.playgamesinteractive.lushvotes.command.LushVotesCommand;
 import com.playgamesinteractive.lushvotes.config.ConfigManager;
+import com.playgamesinteractive.lushvotes.mojang.HttpBedrockLookup;
 import com.playgamesinteractive.lushvotes.mojang.HttpMojangLookup;
 import com.playgamesinteractive.lushvotes.mojang.MojangResolver;
+import com.playgamesinteractive.lushvotes.mojang.PlayerLookup;
 import com.playgamesinteractive.lushvotes.storage.Database;
+import com.playgamesinteractive.lushvotes.storage.NetworkDatabase;
 import com.playgamesinteractive.lushvotes.storage.PendingRewardRepository;
 import com.playgamesinteractive.lushvotes.storage.UuidCacheRepository;
 import com.playgamesinteractive.lushvotes.storage.VotePartyRepository;
@@ -19,11 +22,13 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = "lushvotes",
@@ -39,6 +44,7 @@ public final class LushVotesPlugin {
     private final Path dataDirectory;
 
     private Database database;
+    private NetworkDatabase networkDatabase;
 
     @Inject
     public LushVotesPlugin(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -60,7 +66,19 @@ public final class LushVotesPlugin {
         PendingRewardRepository pendingRewardRepository = new PendingRewardRepository(database, logger);
         VotePartyRepository votePartyRepository = new VotePartyRepository(database, logger);
 
-        MojangResolver mojangResolver = new MojangResolver(new HttpMojangLookup(logger), uuidCache, Clock.systemUTC(), logger);
+        networkDatabase = new NetworkDatabase(configManager.config().networkDatabase(), voteRepository, logger);
+        voteRepository.afterRecord(networkDatabase::requestSync);
+        if (networkDatabase.enabled()) {
+            networkDatabase.requestSync();
+            server.getScheduler().buildTask(this, networkDatabase::requestSync).repeat(5, TimeUnit.MINUTES).schedule();
+        }
+
+        PlayerLookup lookup = new PlayerLookup(
+                name -> server.getPlayer(name).map(Player::getUniqueId),
+                networkDatabase::knownPlayer,
+                new HttpMojangLookup(logger), new HttpBedrockLookup(logger),
+                configManager.config().bedrockPrefix());
+        MojangResolver mojangResolver = new MojangResolver(lookup, uuidCache, Clock.systemUTC(), logger);
 
         server.getChannelRegistrar().register(VotesBridgeChannel.IDENTIFIER);
         VotesBridgeListener bridgeListener = new VotesBridgeListener(server, configManager, pendingRewardRepository,
@@ -79,6 +97,9 @@ public final class LushVotesPlugin {
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
+        if (networkDatabase != null) {
+            networkDatabase.close();
+        }
         if (database != null) {
             database.close();
         }

@@ -1,12 +1,10 @@
 package com.playgamesinteractive.lushvotes.config;
 
 import org.slf4j.Logger;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,26 +16,22 @@ final class YamlFiles {
     private YamlFiles() {
     }
 
-    static void copyDefaultIfMissing(Path target, String resourcePath, Logger logger) {
-        if (Files.exists(target)) {
-            return;
-        }
+    /** Install-once (see {@link BundledFiles}); {@code required} files are recreated if deleted. */
+    static void install(Path dataDirectory, String resourcePath, boolean required, Logger logger) {
         try {
-            Files.createDirectories(target.getParent());
-            try (InputStream in = YamlFiles.class.getClassLoader().getResourceAsStream(resourcePath)) {
-                if (in == null) {
-                    logger.error("Bundled resource '{}' is missing from the jar - cannot create it.", resourcePath);
-                    return;
-                }
-                Files.copy(in, target);
-            }
+            ClassLoader loader = YamlFiles.class.getClassLoader();
+            if (required) BundledFiles.installRequired(dataDirectory, resourcePath, loader);
+            else BundledFiles.installOnce(dataDirectory, resourcePath, loader);
         } catch (IOException e) {
-            logger.error("Failed to create '{}' from the bundled default", target, e);
+            logger.error("Failed to install '{}' from the bundled default", resourcePath, e);
         }
     }
 
     @SuppressWarnings("unchecked")
     static Map<String, Object> read(Path file, Logger logger) {
+        if (!Files.exists(file)) {
+            return new LinkedHashMap<>();
+        }
         try {
             String text = Files.readString(file, StandardCharsets.UTF_8);
             Object loaded = new Yaml().load(text);
@@ -51,20 +45,13 @@ final class YamlFiles {
         }
     }
 
-    static Map<String, Object> mergeMissingTopLevelKeys(Path file, String resourcePath, Map<String, Object> live, Logger logger) {
-        Map<String, Object> defaults = readBundled(resourcePath, logger);
-        boolean changed = false;
-        Map<String, Object> merged = new LinkedHashMap<>(live);
-        for (Map.Entry<String, Object> entry : defaults.entrySet()) {
-            if (!merged.containsKey(entry.getKey())) {
-                merged.put(entry.getKey(), entry.getValue());
-                changed = true;
-            }
-        }
-        if (changed) {
-            write(file, merged, logger);
-            logger.info("Added new default option(s) to '{}' introduced by this update - check the file to tune them.", file);
-        }
+    /**
+     * The operator's file with any top-level key it lacks filled in from the bundled copy - in
+     * memory only. The file itself is never rewritten, so nothing they removed comes back.
+     */
+    static Map<String, Object> withBundledDefaults(String resourcePath, Map<String, Object> live, Logger logger) {
+        Map<String, Object> merged = new LinkedHashMap<>(readBundled(resourcePath, logger));
+        merged.putAll(live);
         return merged;
     }
 
@@ -79,17 +66,6 @@ final class YamlFiles {
         } catch (IOException e) {
             logger.error("Failed to read bundled resource '{}'", resourcePath, e);
             return new LinkedHashMap<>();
-        }
-    }
-
-    private static void write(Path file, Map<String, Object> data, Logger logger) {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(options);
-        try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-            yaml.dump(data, writer);
-        } catch (IOException e) {
-            logger.error("Failed to write '{}'", file, e);
         }
     }
 }

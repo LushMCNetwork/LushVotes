@@ -1,5 +1,7 @@
 package com.playgamesinteractive.lushvotes.bridge.menu;
 
+import com.playgamesinteractive.lushvotes.bridge.util.BundledFiles;
+
 import com.playgamesinteractive.lushvotes.bridge.action.Action;
 import com.playgamesinteractive.lushvotes.bridge.action.ActionParser;
 import com.playgamesinteractive.lushvotes.bridge.lang.ColorText;
@@ -43,7 +45,7 @@ public class MenuManager {
         if (!menusDir.exists()) {
             menusDir.mkdirs();
         }
-        extractBundledDefaultsIfMissing();
+        installBundledMenus();
 
         File[] files = menusDir.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files == null) {
@@ -63,11 +65,9 @@ public class MenuManager {
         plugin.getLogger().info("Loaded " + loaded.size() + " menu(s).");
     }
 
-    private void extractBundledDefaultsIfMissing() {
+    private void installBundledMenus() {
         for (String fileName : BUNDLED_DEFAULTS) {
-            if (!new File(menusDir, fileName).exists() && plugin.getResource("menus/" + fileName) != null) {
-                plugin.saveResource("menus/" + fileName, false);
-            }
+            BundledFiles.installOnce(plugin, "menus/" + fileName); // a deleted menu stays deleted
         }
     }
 

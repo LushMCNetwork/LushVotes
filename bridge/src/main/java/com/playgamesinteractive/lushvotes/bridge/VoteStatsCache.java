@@ -20,6 +20,11 @@ final class VoteStatsCache {
         stats.remove(uuid);
     }
 
+    /** Whether the proxy has sent this player's real stats yet; until then {@link #get} reports zero votes. */
+    boolean loaded(UUID uuid) {
+        return stats.containsKey(uuid);
+    }
+
     Stats get(UUID uuid) {
         return stats.getOrDefault(uuid, Stats.EMPTY);
     }

@@ -63,6 +63,7 @@ final class LushVotesExpansion extends PlaceholderExpansion {
         }
         VoteStatsCache.Stats stats = statsCache.get(player.getUniqueId());
         return switch (key) {
+            case "loaded" -> String.valueOf(statsCache.loaded(player.getUniqueId()));
             case "total" -> String.valueOf(stats.totalVotes());
             case "total_formatted" -> String.format(Locale.US, "%,d", stats.totalVotes());
             case "last" -> stats.lastVoteAtEpochMillis() < 0 ? "never"

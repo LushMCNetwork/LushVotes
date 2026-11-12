@@ -72,12 +72,28 @@ public final class Database {
                         )
                         """);
                 statement.execute("INSERT OR IGNORE INTO vote_party (id, counter) VALUES (1, 0)");
+                forgetPrefixedNames(statement);
             }
         } catch (ClassNotFoundException e) {
             logger.error("sqlite-jdbc driver class not found - is it missing from the shaded jar?", e);
         } catch (SQLException e) {
             logger.error("Failed to open lushvotes.db", e);
         }
+    }
+
+    /**
+     * Version 1: names starting with Floodgate's prefix used to go straight to Mojang, which can
+     * return an unrelated Java account. Those cached answers are dropped so they resolve again.
+     */
+    private void forgetPrefixedNames(Statement statement) throws SQLException {
+        int version;
+        try (ResultSet rs = statement.executeQuery("PRAGMA user_version")) {
+            version = rs.next() ? rs.getInt(1) : 0;
+        }
+        if (version >= 1) return;
+        int dropped = statement.executeUpdate("DELETE FROM uuid_cache WHERE username LIKE '\\_%' ESCAPE '\\'");
+        statement.execute("PRAGMA user_version = 1");
+        if (dropped > 0) logger.info("Dropped {} cached UUID(s) for Bedrock-style names so they resolve again", dropped);
     }
 
     private void addColumnIfMissing(Statement statement, String table, String column, String definition) throws SQLException {

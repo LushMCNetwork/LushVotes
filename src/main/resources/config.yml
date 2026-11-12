@@ -18,3 +18,16 @@ vote-party:
   target: 100
   commands:
     - "crates key giveall vote 1 -sf"
+
+# Floodgate's username-prefix for Bedrock players. A voted name that starts with it is looked up
+# as a Bedrock gamertag, never on Mojang, where a Java account may own the same spelling.
+bedrock-prefix: "_"
+
+# The shared network database the website reads votes from. Leave the password blank to turn the
+# copy off; votes are always kept in lushvotes.db and copied over once it's reachable again.
+network-database:
+  host: 127.0.0.1
+  port: 3306
+  name: network
+  user: network
+  password: ""

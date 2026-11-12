@@ -6,13 +6,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Full SimpleCommand.suggest() isn't exercised here - Velocity's Invocation/
- * ProxyServer are large interfaces this project doesn't otherwise mock (see
- * VoteCommandTest in the bridge module, which only tests its own extracted
- * pure function). filter() is the one general-purpose piece of the new
- * tab-completion logic, so it's what's covered.
- */
 class LushVotesCommandTest {
 
     @Test

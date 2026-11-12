@@ -13,12 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Real Mojang username->UUID lookup. Mojang returns the id as a 32-char
- * hex string with no dashes ({@code {"id":"...","name":"..."}}) - a single
- * field is not worth pulling in a JSON dependency for, so this pulls it
- * with a regex and reformats it into a dashed UUID by hand.
- */
 public final class HttpMojangLookup implements MojangLookup {
 
     private static final Pattern ID_FIELD = Pattern.compile("\"id\"\\s*:\\s*\"([0-9a-fA-F]{32})\"");
@@ -48,7 +42,7 @@ public final class HttpMojangLookup implements MojangLookup {
 
     private Optional<UUID> parse(HttpResponse<String> response) {
         if (response.statusCode() == 204 || response.statusCode() == 404) {
-            return Optional.empty(); // no such username
+            return Optional.empty();
         }
         if (response.statusCode() != 200) {
             logger.warn("Mojang lookup returned HTTP {} for a username", response.statusCode());

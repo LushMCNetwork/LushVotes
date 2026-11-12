@@ -1,7 +1,3 @@
-# LushVotes Language Strings (en_US)
-
-
-# Reward
 reward:
   online-credited:
     - ""
@@ -13,11 +9,9 @@ reward:
     - "<#fdf700>▶ Your Reward Has Been Granted! ◀"
     - ""
 
-# Claim
 claim:
   nothing: "<#ff1155>✘ You have no vote rewards waiting to be claimed."
   claimed: "<#00f396>✔ You have successfully claimed %count% vote reward(s)!"
 
-# Reminder
 reminder:
   unclaimed: "<#fdf700>⌚ You have unclaimed vote rewards! Run <white>/vote claim <#fdf700>to collect them."

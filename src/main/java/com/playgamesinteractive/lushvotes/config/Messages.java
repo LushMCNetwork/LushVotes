@@ -3,10 +3,6 @@ package com.playgamesinteractive.lushvotes.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Flattened dotted-key view of {@code language/en_US.yml} (proxy strings
- * only - see that file's header comment for why bridge has its own copy).
- */
 public final class Messages {
 
     private final Map<String, String> flat;
@@ -38,7 +34,6 @@ public final class Messages {
         }
     }
 
-    /** Raw string with {name} placeholders substituted; falls back to the key itself if missing. */
     public String get(String key, Object... placeholders) {
         String value = flat.get(key);
         if (value == null) {

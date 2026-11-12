@@ -15,7 +15,6 @@ class LushVotesConfigTest {
     void defaultsMatchTheBundledConfigYml() {
         LushVotesConfig config = LushVotesConfig.defaults();
         assertTrue(config.enabled());
-        assertEquals(20, config.dedupeWindowHours());
         assertEquals(List.of("eco give %player% 100"), config.rewardCommands());
         assertEquals(List.of("firework", "sound"), config.celebrationEffects());
         assertEquals("BALL_LARGE", config.fireworkType());
@@ -29,7 +28,6 @@ class LushVotesConfigTest {
     void fromMapParsesOverridesOverDefaults() {
         Map<String, Object> root = Map.of(
                 "enabled", false,
-                "dedupe", Map.of("window-hours", 5),
                 "reward", Map.of("commands", List.of("gems give %player% 250")),
                 "celebration", Map.of(
                         "effects", List.of("sound"),
@@ -41,7 +39,6 @@ class LushVotesConfigTest {
         LushVotesConfig config = LushVotesConfig.fromMap(root);
 
         assertFalse(config.enabled());
-        assertEquals(5, config.dedupeWindowHours());
         assertEquals(List.of("gems give %player% 250"), config.rewardCommands());
         assertEquals(List.of("sound"), config.celebrationEffects());
         assertEquals("STAR", config.fireworkType());

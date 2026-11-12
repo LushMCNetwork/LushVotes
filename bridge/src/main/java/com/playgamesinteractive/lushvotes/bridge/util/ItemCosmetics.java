@@ -9,23 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * Shared by every menu item icon builder. {@code enchantment_glint_override}
- * adds a real (but harmless) enchantment so the item genuinely glows, then
- * hides the enchantment line from the tooltip - a plain
- * {@code setEnchantmentGlintOverride()} call only fakes the glint and
- * doesn't survive every client/resource-pack combination the way a real
- * enchant + HIDE_ENCHANTS does. Leave {@code enchantmentGlintOverride} null
- * to not touch glint at all. Same convention as lushlobby's ItemCosmetics.
- * {@code hideTooltip} is its own boolean argument, not an item flag - see
- * MenuItem's doc for why {@code HIDE_TOOLTIP} isn't a real flag here.
- */
 public final class ItemCosmetics {
 
     private ItemCosmetics() {
     }
 
-    /** Colorized display name (skipped when empty), colorized lore, then flags/glint/tooltip - the shared decoration sequence for every configured item. */
     public static void decorate(ItemMeta meta, String displayName, List<String> lore,
                                  List<ItemFlag> itemFlags, Boolean enchantmentGlintOverride, boolean hideTooltip) {
         if (displayName != null && !displayName.isEmpty()) {
@@ -36,7 +24,6 @@ public final class ItemCosmetics {
         meta.setHideTooltip(hideTooltip);
     }
 
-    /** Shared "item_flags:" list parsing for menus/*.yml - unknown names are logged and skipped. */
     public static List<ItemFlag> parseItemFlags(List<String> raw, String context, Logger logger) {
         List<ItemFlag> flags = new ArrayList<>();
         for (String name : raw) {

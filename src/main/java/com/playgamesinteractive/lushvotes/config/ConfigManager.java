@@ -5,12 +5,6 @@ import org.slf4j.Logger;
 import java.nio.file.Path;
 import java.util.Map;
 
-/**
- * Loads {@code config.yml} and {@code language/en_US.yml} from the plugin
- * data directory, copying bundled defaults on first run and backfilling any
- * top-level key a jar update added. See {@link YamlFiles} for the shared
- * file mechanics.
- */
 public final class ConfigManager {
 
     private final Path dataDirectory;

@@ -8,15 +8,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
-/**
- * Executes a parsed Action list against a player. CONSOLE commands are
- * dispatched via the global region scheduler since they may touch state
- * outside the player's own region - PLAYER and MESSAGE run inline, since
- * callers only ever invoke this from an event already running on that
- * player's own thread (an inventory click). Same convention and rationale
- * as lushlobby's ActionRunner. MenuListener already closes the inventory
- * before running any actions, so there's no separate "close" action needed.
- */
 public class ActionRunner {
 
     private final Plugin plugin;

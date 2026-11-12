@@ -83,7 +83,7 @@ class MojangResolverTest {
             lookups.incrementAndGet();
             return CompletableFuture.completedFuture(Optional.of(renamed));
         };
-        Clock now = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC); // 30+ days past the cache TTL
+        Clock now = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
         MojangResolver resolver = new MojangResolver(lookup, cache, now, LOGGER);
 
         Optional<UUID> result = resolver.resolve("Steve").get();

@@ -9,15 +9,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-/**
- * {@code %lushvotes_total%}, {@code %lushvotes_total_formatted%},
- * {@code %lushvotes_last%}, {@code %lushvotes_party_current%},
- * {@code %lushvotes_party_target%}, {@code %lushvotes_party_remaining%}.
- * Both vote history and party progress live on the proxy (see the design
- * doc's rationale), so these read from {@link VoteStatsCache}/{@link
- * VotePartyCache}, only ever as fresh as the last message this backend
- * received - see VotesChannelListener.
- */
 final class LushVotesExpansion extends PlaceholderExpansion {
 
     private static final DateTimeFormatter LAST_VOTE_FORMAT =
@@ -57,7 +48,6 @@ final class LushVotesExpansion extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         String key = params.toLowerCase(Locale.ROOT);
-        // Party progress is network-wide, not per-player - answer it even without a player context.
         switch (key) {
             case "party_current":
                 return String.valueOf(partyCache.current());

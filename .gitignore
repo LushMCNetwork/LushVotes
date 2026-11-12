@@ -4,3 +4,17 @@ dependency-reduced-pom.xml
 *.iml
 .vscode/
 .DS_Store
+# Build output, IDE files and secrets (sync 2026-11-12)
+build/
+out/
+.gradle/
+node_modules/
+*.log
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.jks
+network-db.env
+!.env.example

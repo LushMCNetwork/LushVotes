@@ -7,6 +7,7 @@ authors: [mechobliterate, PlayGamesInteractive]
 description: Backend companion for LushVotes - executes reward commands, celebration effects, and %lushvotes_*% placeholders.
 website: https://playgamesinteractive.com
 softdepend: [PlaceholderAPI]
+
 commands:
   vote:
     description: Open the voting menu.

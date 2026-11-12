@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Username -> UUID cache backing {@code MojangResolver}, so most votes never hit Mojang at all. */
 public final class UuidCacheRepository {
 
     private final Database database;

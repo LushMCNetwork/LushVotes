@@ -13,20 +13,11 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Raw-SnakeYAML equivalent of LushShop/LushAuctions' YamlDefaultsMerger, for
- * Velocity plugins - there's no {@code JavaPlugin.saveDefaultConfig()} or
- * {@code ConfigurationSection} on this platform, so config here is a plain
- * {@code Map<String, Object>} read/written by hand. Same rationale and same
- * "only fill in a key that's entirely absent" behavior as the Bukkit-side
- * version, ported per LushRelay's ConfigManager convention.
- */
 final class YamlFiles {
 
     private YamlFiles() {
     }
 
-    /** Copies the jar-bundled resource to {@code target} if nothing's there yet. */
     static void copyDefaultIfMissing(Path target, String resourcePath, Logger logger) {
         if (Files.exists(target)) {
             return;
@@ -60,13 +51,6 @@ final class YamlFiles {
         }
     }
 
-    /**
-     * Backfills top-level keys present in the bundled resource but absent
-     * from the live file, then rewrites the live file if anything changed.
-     * Deliberately shallow (top-level keys only) - a list like {@code sites}
-     * or {@code reward.commands} is admin-curated content; once the key
-     * exists at all, this never reaches inside it.
-     */
     static Map<String, Object> mergeMissingTopLevelKeys(Path file, String resourcePath, Map<String, Object> live, Logger logger) {
         Map<String, Object> defaults = readBundled(resourcePath, logger);
         boolean changed = false;

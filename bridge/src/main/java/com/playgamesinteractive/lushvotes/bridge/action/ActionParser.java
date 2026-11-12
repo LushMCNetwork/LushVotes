@@ -6,13 +6,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Parses "[TYPE] argument" strings (case-insensitive tag, e.g. both
- * "[MESSAGE]" and "[message]" work) into Actions. Lines that don't match the
- * bracket-tag format, or name an unknown type, are logged and skipped
- * rather than failing the whole menu. Same convention as lushlobby's
- * ActionParser.
- */
 public final class ActionParser {
 
     private static final Pattern ACTION_PATTERN = Pattern.compile("^\\[(\\w+)]\\s?(.*)$");

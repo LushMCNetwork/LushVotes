@@ -7,11 +7,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
-/**
- * Handles clicks inside any inventory backed by a MenuHolder. Each item's
- * actions run through the shared ActionRunner, then the menu closes - these
- * are one-shot selector menus. Same convention as lushlobby's MenuListener.
- */
 public class MenuListener implements Listener {
 
     private final ActionRunner actionRunner;

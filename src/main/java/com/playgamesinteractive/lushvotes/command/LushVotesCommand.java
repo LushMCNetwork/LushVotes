@@ -22,12 +22,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * {@code /lushvotes admin <subcommand>} - everything admin-facing lives
- * here on the proxy (not split across a bridge-side "/vote admin" surface
- * too) since all the actual data - vote history, dedupe, the party counter -
- * lives in LushVotes' own SQLite store, not on any backend.
- */
 public final class LushVotesCommand implements SimpleCommand {
 
     private static final String PERMISSION = "lushvotes.admin";
@@ -121,7 +115,6 @@ public final class LushVotesCommand implements SimpleCommand {
         return server.getAllPlayers().stream().map(Player::getUsername).toList();
     }
 
-    /** Package-private (not private) so LushVotesCommandTest can exercise it directly. */
     static List<String> filter(List<String> options, String prefix) {
         return options.stream()
                 .filter(option -> option.toLowerCase(Locale.ROOT).startsWith(prefix.toLowerCase(Locale.ROOT)))

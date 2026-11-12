@@ -11,14 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Owns the single embedded SQLite connection ({@code lushvotes.db} at the
- * plugin data directory root). There's only ever one LushVotes proxy
- * process, so a single-writer embedded DB is enough - no need for
- * LushRelay's shared MySQL. Same convention as LushAuctions/LushShop's
- * Database, ported off {@code JavaPlugin.getDataFolder()} to a raw
- * {@code Path} since this is a Velocity plugin.
- */
 public final class Database {
 
     private final Path dataDirectory;
@@ -39,18 +31,9 @@ public final class Database {
         }
         Path file = dataDirectory.resolve("lushvotes.db");
         try {
-            // Velocity isolates each plugin's classes in their own classloader, so
-            // sqlite-jdbc's ServiceLoader-based auto-registration (META-INF/services)
-            // often never reaches DriverManager's view from this call site - it ends up
-            // registered under a classloader DriverManager's caller-sensitive check
-            // won't allow, and getConnection fails with "No suitable driver found" even
-            // though the driver class is right there on this plugin's own classpath.
-            // Loading it explicitly registers it under this classloader instead.
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath());
             try (Statement statement = connection.createStatement()) {
-                // WAL trades a little extra disk usage for readers (e.g. /lushvotes admin
-                // credit checks) never blocking on a concurrent write (a vote being credited).
                 statement.execute("PRAGMA journal_mode=WAL");
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS uuid_cache (
@@ -82,10 +65,6 @@ public final class Database {
                 statement.execute("CREATE INDEX IF NOT EXISTS idx_pending_uuid ON pending_rewards(uuid, delivered_at)");
                 addColumnIfMissing(statement, "pending_rewards", "kind", "TEXT NOT NULL DEFAULT 'VOTE'");
 
-                // Singleton row (id is always 1) tracking progress toward the next vote
-                // party - see VotePartyRepository. A real row is seeded below rather than
-                // relying on callers to insert-or-update, so increment can be one atomic
-                // UPDATE ... RETURNING statement.
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS vote_party (
                             id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -101,7 +80,6 @@ public final class Database {
         }
     }
 
-    /** Idempotent - safe to call every startup. SQLite has no "ADD COLUMN IF NOT EXISTS", so check PRAGMA table_info first. */
     private void addColumnIfMissing(Statement statement, String table, String column, String definition) throws SQLException {
         try (ResultSet rs = statement.getConnection().createStatement().executeQuery("PRAGMA table_info(" + table + ")")) {
             while (rs.next()) {

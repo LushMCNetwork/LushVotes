@@ -24,21 +24,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Proxy side of {@link VotesBridgeChannel}. Pushes celebration/party config
- * to a freshly (re)connected backend, answers a backend's claim/count/stats
- * requests (auth-checked the same way as LushRelay's
- * PunishBridgeRequestListener - the request only makes sense if that UUID
- * is really a player currently connected through the requesting backend),
- * records delivery acks, and implements both {@link RewardDispatcher} (a
- * single vote's immediate-delivery path) and {@link VotePartyDispatcher}
- * (rewarding every online player once the party target is hit).
- * <p>
- * Plugin messages to a backend ride on an actual player's connection (see
- * {@code ServerConnection#sendPluginMessage}) - there's no "send to a
- * server" independent of any player, same gotcha documented on
- * VanishBridgeListener.
- */
 public final class VotesBridgeListener implements RewardDispatcher, VotePartyDispatcher {
 
     private final ProxyServer server;
@@ -63,8 +48,6 @@ public final class VotesBridgeListener implements RewardDispatcher, VotePartyDis
 
     @Subscribe
     public void onServerPostConnect(ServerPostConnectEvent event) {
-        // Only push once per backend (the first player to land there since it came up),
-        // not on every join - same throttle as VanishBridgeListener.
         if (event.getPlayer().getCurrentServer()
                 .map(connection -> connection.getServer().getPlayersConnected().size()).orElse(0) != 1) {
             return;
@@ -103,12 +86,10 @@ public final class VotesBridgeListener implements RewardDispatcher, VotePartyDis
         }
     }
 
-    /** Called by /lushvotes admin reload so already-connected backends pick up edits without a restart. */
     public void broadcastConfigToAllBackends() {
         forEachConnectedBackend(this::sendConfigSync);
     }
 
-    /** Called after every credited vote (see VoteService) - keeps %lushvotes_party_*% fresh everywhere, not just where the vote landed. */
     @Override
     public void pushProgress(int current, int target) {
         forEachConnectedBackend(connection -> send(connection, VotesProtocol.encodePartyProgress(

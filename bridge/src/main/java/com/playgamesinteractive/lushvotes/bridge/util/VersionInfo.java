@@ -6,10 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Reads version.properties, written at build time by buildnumber-maven-plugin.
- * "unknown" for an IDE build, which never goes through Maven packaging.
- */
 public final class VersionInfo {
 
     private static String commit = "unknown";

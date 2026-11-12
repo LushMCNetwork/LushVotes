@@ -69,7 +69,7 @@ class PendingRewardRepositoryTest {
     void markingDeliveredTwiceIsHarmless() {
         long id = repository.create(STEVE, "Steve", "PlanetMinecraft", Instant.now(), RewardKind.VOTE);
         repository.markDelivered(id, Instant.now());
-        repository.markDelivered(id, Instant.now()); // ack arriving twice must not throw or corrupt state
+        repository.markDelivered(id, Instant.now());
 
         assertEquals(0, repository.undelivered(STEVE).size());
     }

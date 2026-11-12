@@ -8,23 +8,6 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 
-/**
- * Decodes every message LushVotes (proxy) sends over {@link VotesChannel}.
- * See VotesBridgeListener on the proxy side for the encoder.
- * <ul>
- *   <li>{@code CONFIG_SYNC} - mirrors celebration effects locally.</li>
- *   <li>{@code PARTY_PROGRESS} - mirrors vote party progress locally, for
- *   %lushvotes_party_*%.</li>
- *   <li>{@code REWARD_NOW} - the player is online right now; run the reward
- *   and celebrate immediately.</li>
- *   <li>{@code PENDING_RESPONSE} - answers REQUEST_CLAIM; executes every queued
- *   reward and shows the result.</li>
- *   <li>{@code PENDING_COUNT_RESPONSE} - answers REQUEST_PENDING_COUNT; a nudge to
- *   run /vote claim, executes nothing.</li>
- *   <li>{@code STATS_RESPONSE} - answers REQUEST_STATS; refreshes VoteStatsCache,
- *   informational only.</li>
- * </ul>
- */
 final class VotesChannelListener implements PluginMessageListener {
 
     private final JavaPlugin plugin;
@@ -82,8 +65,6 @@ final class VotesChannelListener implements PluginMessageListener {
         statsCache.update(reward.uuid(), reward.stats().totalVotes(), reward.stats().lastVoteAtEpochMillis());
         Player player = Bukkit.getPlayer(reward.uuid());
         if (player == null) {
-            // Disconnected between the proxy crediting this and the message arriving -
-            // their next /vote claim will pick it up instead.
             return;
         }
         rewardExecutor.execute(reward.commands());
@@ -91,13 +72,12 @@ final class VotesChannelListener implements PluginMessageListener {
         send(player, VotesProtocol.encodeDeliveredAck(reward.pendingRewardId()));
     }
 
-    /** Answers /vote claim - executes everything queued and shows the result, regardless of count. */
     private void handlePendingResponse(byte[] message) throws IOException {
         VotesProtocol.PendingResponse response = VotesProtocol.decodePendingResponse(message);
         statsCache.update(response.uuid(), response.stats().totalVotes(), response.stats().lastVoteAtEpochMillis());
         Player player = Bukkit.getPlayer(response.uuid());
         if (player == null) {
-            return; // left before the claim response arrived
+            return;
         }
         for (VotesProtocol.RewardCommands reward : response.rewards()) {
             rewardExecutor.execute(reward.commands());
@@ -106,7 +86,6 @@ final class VotesChannelListener implements PluginMessageListener {
         celebrationEffects.showClaimResult(player, response.rewards().size());
     }
 
-    /** Answers the join-time reminder check - never executes or acks anything. */
     private void handlePendingCountResponse(byte[] message) throws IOException {
         VotesProtocol.PendingCount count = VotesProtocol.decodePendingCountResponse(message);
         if (count.count() <= 0) {
@@ -118,7 +97,6 @@ final class VotesChannelListener implements PluginMessageListener {
         }
     }
 
-    /** Answers the join-time stats request - purely refreshes the cache, nothing is executed. */
     private void handleStatsResponse(byte[] message) throws IOException {
         VotesProtocol.StatsResponse response = VotesProtocol.decodeStatsResponse(message);
         statsCache.update(response.uuid(), response.stats().totalVotes(), response.stats().lastVoteAtEpochMillis());

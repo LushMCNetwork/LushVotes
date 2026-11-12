@@ -14,13 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * {@code /vote} - opens the menus/vote_menu.yml GUI.
- * {@code /vote claim} - asks the proxy for every queued reward and runs
- * them immediately, instead of them landing automatically on next login
- * (see the design's offline-claim flow) - see VotesChannelListener's
- * PENDING_RESPONSE handling for what happens with the answer.
- */
 public final class VoteCommand implements CommandExecutor, TabCompleter {
 
     private static final List<String> SUBCOMMANDS = List.of("claim");
@@ -55,7 +48,6 @@ public final class VoteCommand implements CommandExecutor, TabCompleter {
         return List.of();
     }
 
-    /** Same case-insensitive prefix filter LushRelay's proxy commands use for tab-complete. */
     private static List<String> filter(List<String> options, String prefix) {
         return options.stream()
                 .filter(option -> option.toLowerCase(Locale.ROOT).startsWith(prefix.toLowerCase(Locale.ROOT)))

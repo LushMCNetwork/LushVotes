@@ -6,13 +6,6 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-/**
- * Resolves a config-authored firework color, either a hex string
- * ({@code #rrggbb}) or a named {@code org.bukkit.Color} field (WHITE,
- * YELLOW, RED, ...). Color isn't an enum, so named lookup goes through
- * reflection - there's no {@code valueOf(String)}. Falls back to {@code
- * def} (logged) for anything that's neither.
- */
 public final class FireworkColors {
 
     private FireworkColors() {
@@ -30,7 +23,6 @@ public final class FireworkColors {
                 return color;
             }
         } catch (NoSuchFieldException | IllegalAccessException ignored) {
-            // falls through to the warning below
         }
         logger.warning("Unknown firework color '" + value + "' - using the default instead.");
         return def;
